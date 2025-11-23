@@ -42,16 +42,41 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
     if (type === 'docker_context') {
       return !!context.docker_context;
     }
+    if (type === 'container') {
+      return !!context.container;
+    }
     // Language modules
     if (['nodejs', 'golang', 'rust', 'python', 'java', 'kotlin', 'dotnet', 'terraform', 'c', 'elixir', 'elm', 'haskell', 'julia', 'lua', 'nim', 'ocaml', 'perl', 'php', 'ruby', 'scala', 'swift', 'zig'].includes(type)) {
       return !!context.languages?.[type];
     }
     // Container/Env modules - hide by default unless we have specific context for them
-    if (['nix_shell', 'conda', 'container', 'singularity', 'kubernetes', 'vcsh', 'fossil_branch', 'hg_branch', 'pijul_channel'].includes(type)) {
+    if (['nix_shell', 'conda', 'singularity', 'kubernetes', 'vcsh', 'fossil_branch', 'hg_branch', 'pijul_channel'].includes(type)) {
       return false; // For now, we don't have mock data/context for these, so hide them to avoid clutter
     }
 
     return true;
+  };
+
+  const buildDirectoryPath = (rawPath: string, props: Record<string, any>): string => {
+    if (!rawPath) return '';
+    const substitutions = props.substitutions || {};
+    const truncLen = props.truncation_length ?? 0;
+    const truncSymbol = props.truncation_symbol ?? '…/';
+
+    const hasHome = rawPath.startsWith('~');
+    const hasRoot = rawPath.startsWith('/');
+    const prefix = hasHome ? '~' : hasRoot ? '/' : '';
+
+    const parts = rawPath.replace(/^~?\/+/, '').split('/').filter(Boolean);
+    const substituted = parts.map(p => substitutions[p] ?? p);
+
+    let visible = substituted;
+    if (truncLen && substituted.length > truncLen) {
+      visible = substituted.slice(substituted.length - truncLen);
+      return `${prefix}${truncSymbol}${visible.join('/')}`;
+    }
+
+    return `${prefix}${visible.join('/') || (hasRoot ? '' : '')}`;
   };
 
   return (
@@ -147,7 +172,10 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
               }
               // Context-aware overrides
               else if (mod.type === 'directory' && v === '$path') {
-                variables[v] = context.path;
+                variables[v] = buildDirectoryPath(context.path, mod.properties);
+              }
+              else if (mod.type === 'directory' && v === '$read_only') {
+                variables[v] = context.readOnly ? (mod.properties.read_only || def.defaultProps.read_only || '') : '';
               }
               else if (mod.type === 'git_branch' && v === '$branch') {
                 variables[v] = context.git?.branch || '';
@@ -158,6 +186,9 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
               }
               else if (context.languages?.[mod.type] && v === '$version') {
                 variables[v] = context.languages[mod.type];
+              }
+              else if (mod.type === 'container' && v === '$name') {
+                variables[v] = context.container?.name || '';
               }
               else if (mod.type === 'package' && v === '$version') {
                 variables[v] = context.package?.version || '';

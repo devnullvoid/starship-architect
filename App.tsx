@@ -12,7 +12,9 @@ import {
   Check,
   Palette,
   Upload,
-  X
+  X,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 import { MODULE_DEFINITIONS, THEMES } from './constants';
 import { ActiveModule, ModuleDefinition, Theme } from './types';
@@ -67,6 +69,20 @@ const PREDEFINED_CONTEXTS: import('./types').PreviewContext[] = [
       version: '1.0.0'
     },
     time: '16:20:00'
+  },
+  {
+    id: 'container',
+    name: 'Container',
+    path: '/app/src',
+    container: {
+      name: 'devbox'
+    },
+    docker_context: 'default',
+    git: {
+      branch: 'main',
+      status: ' +'
+    },
+    time: '17:45:00'
   }
 ];
 
@@ -96,6 +112,7 @@ export default function App() {
   const [tomlError, setTomlError] = useState<string | null>(null);
   const [themeYamlInput, setThemeYamlInput] = useState('');
   const [themeError, setThemeError] = useState<string | null>(null);
+  const [showSidebar, setShowSidebar] = useState(true);
 
   // Sync TOML content when modules change (only if not editing TOML directly to avoid loop)
   useEffect(() => {
@@ -215,126 +232,145 @@ export default function App() {
     <div className="min-h-screen flex flex-col md:flex-row font-sans bg-[#0f172a] text-slate-200">
 
       {/* LEFT SIDEBAR - BUILDER */}
-      <div className="w-full md:w-1/3 lg:w-1/4 flex flex-col border-r border-slate-700 bg-[#1e293b]">
-        <div className="p-4 border-b border-slate-700 flex justify-between items-center">
-          <h1 className="font-bold text-xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-            Starship Architect
-          </h1>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setShowExport(!showExport)}
-              className={`p-2 rounded transition-colors ${showExport ? 'bg-blue-600 text-white' : 'hover:bg-slate-700 text-slate-400'}`}
-              title="Edit TOML"
-            >
-              <Code size={20} />
-            </button>
-          </div>
-        </div>
-
-        {/* AI PROMPT AREA */}
-        {process.env.API_KEY && (
-          <div className="p-4 border-b border-slate-700 bg-[#162032]">
+      {showSidebar ? (
+        <div className="w-full md:w-1/3 lg:w-1/4 flex flex-col border-r border-slate-700 bg-[#1e293b]">
+          <div className="p-4 border-b border-slate-700 flex justify-between items-center">
+            <h1 className="font-bold text-xl text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+              Starship Architect
+            </h1>
             <div className="flex gap-2">
-              <input
-                type="text"
-                value={aiPrompt}
-                onChange={(e) => setAiPrompt(e.target.value)}
-                placeholder="e.g., Cyberpunk neon style..."
-                className="flex-1 bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500"
-                onKeyDown={(e) => e.key === 'Enter' && handleAiGenerate()}
-              />
               <button
-                onClick={handleAiGenerate}
-                disabled={isGenerating}
-                className="bg-purple-600 hover:bg-purple-500 text-white px-3 py-2 rounded disabled:opacity-50"
+                onClick={() => setShowExport(!showExport)}
+                className={`p-2 rounded transition-colors ${showExport ? 'bg-blue-600 text-white' : 'hover:bg-slate-700 text-slate-400'}`}
+                title="Edit TOML"
               >
-                {isGenerating ? <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" /> : <Wand2 size={16} />}
+                <Code size={20} />
+              </button>
+              <button
+                onClick={() => setShowSidebar(false)}
+                className="p-2 rounded hover:bg-slate-700 text-slate-400"
+                title="Collapse sidebar"
+              >
+                <PanelLeftClose size={20} />
               </button>
             </div>
           </div>
-        )}
 
-        {/* MODULE LIST */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
-          {modules.map((module, index) => (
-            <div
-              key={module.id}
-              className={`
-                group flex items-center gap-2 p-2 rounded border transition-all cursor-pointer
-                ${selectedModuleId === module.id
-                  ? 'bg-blue-900/30 border-blue-500'
-                  : 'bg-slate-800/50 border-slate-700 hover:border-slate-500 hover:bg-slate-800'}
-                ${module.disabled ? 'opacity-50' : 'opacity-100'}
-              `}
-              onClick={() => {
-                setSelectedModuleId(module.id);
-                if (showExport) setShowExport(false);
-              }}
-            >
-              <div className="text-slate-500 cursor-grab active:cursor-grabbing">
-                <GripVertical size={16} />
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="font-mono text-sm font-bold text-slate-200 capitalize truncate">
-                  {module.type.replace('_', ' ')}
-                </div>
-                <div className="text-[10px] text-slate-400 truncate font-mono">
-                  {module.properties.format || 'Default format'}
-                </div>
-              </div>
-
-              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {/* AI PROMPT AREA */}
+          {process.env.API_KEY && (
+            <div className="p-4 border-b border-slate-700 bg-[#162032]">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  placeholder="e.g., Cyberpunk neon style..."
+                  className="flex-1 bg-slate-800 border border-slate-600 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500"
+                  onKeyDown={(e) => e.key === 'Enter' && handleAiGenerate()}
+                />
                 <button
-                  onClick={(e) => { e.stopPropagation(); handleMoveModule(index, 'up'); }}
-                  className="p-1 hover:text-blue-400 disabled:opacity-20"
-                  disabled={index === 0}
+                  onClick={handleAiGenerate}
+                  disabled={isGenerating}
+                  className="bg-purple-600 hover:bg-purple-500 text-white px-3 py-2 rounded disabled:opacity-50"
                 >
-                  <ArrowUp size={14} />
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleMoveModule(index, 'down'); }}
-                  className="p-1 hover:text-blue-400 disabled:opacity-20"
-                  disabled={index === modules.length - 1}
-                >
-                  <ArrowDown size={14} />
-                </button>
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleDeleteModule(module.id); }}
-                  className="p-1 hover:text-red-400"
-                >
-                  <Trash2 size={14} />
+                  {isGenerating ? <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" /> : <Wand2 size={16} />}
                 </button>
               </div>
             </div>
-          ))}
+          )}
 
-          {/* ADD BUTTON */}
-          <div className="relative mt-4">
-            <button
-              onClick={() => setShowAddMenu(!showAddMenu)}
-              className="w-full py-3 border-2 border-dashed border-slate-700 rounded-lg text-slate-500 hover:border-blue-500 hover:text-blue-500 flex justify-center items-center gap-2 transition-colors"
-            >
-              <Plus size={20} /> Add Module
-            </button>
+          {/* MODULE LIST */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-2">
+            {modules.map((module, index) => (
+              <div
+                key={module.id}
+                className={`
+                  group flex items-center gap-2 p-2 rounded border transition-all cursor-pointer
+                  ${selectedModuleId === module.id
+                    ? 'bg-blue-900/30 border-blue-500'
+                    : 'bg-slate-800/50 border-slate-700 hover:border-slate-500 hover:bg-slate-800'}
+                  ${module.disabled ? 'opacity-50' : 'opacity-100'}
+                `}
+                onClick={() => {
+                  setSelectedModuleId(module.id);
+                  if (showExport) setShowExport(false);
+                }}
+              >
+                <div className="text-slate-500 cursor-grab active:cursor-grabbing">
+                  <GripVertical size={16} />
+                </div>
 
-            {showAddMenu && (
-              <div className="absolute bottom-full left-0 w-full mb-2 bg-slate-800 border border-slate-600 rounded-lg shadow-xl max-h-64 overflow-y-auto z-10">
-                {MODULE_DEFINITIONS.map(def => (
+                <div className="flex-1 min-w-0">
+                  <div className="font-mono text-sm font-bold text-slate-200 capitalize truncate">
+                    {module.type.replace('_', ' ')}
+                  </div>
+                  <div className="text-[10px] text-slate-400 truncate font-mono">
+                    {module.properties.format || 'Default format'}
+                  </div>
+                </div>
+
+                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
-                    key={def.name}
-                    onClick={() => handleAddModule(def)}
-                    className="w-full text-left px-4 py-2 hover:bg-slate-700 text-sm text-slate-200 flex justify-between items-center"
+                    onClick={(e) => { e.stopPropagation(); handleMoveModule(index, 'up'); }}
+                    className="p-1 hover:text-blue-400 disabled:opacity-20"
+                    disabled={index === 0}
                   >
-                    <span className="capitalize">{def.name.replace('_', ' ')}</span>
-                    <span className="text-xs text-slate-500">{def.description}</span>
+                    <ArrowUp size={14} />
                   </button>
-                ))}
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleMoveModule(index, 'down'); }}
+                    className="p-1 hover:text-blue-400 disabled:opacity-20"
+                    disabled={index === modules.length - 1}
+                  >
+                    <ArrowDown size={14} />
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleDeleteModule(module.id); }}
+                    className="p-1 hover:text-red-400"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </div>
-            )}
+            ))}
+
+            {/* ADD BUTTON */}
+            <div className="relative mt-4">
+              <button
+                onClick={() => setShowAddMenu(!showAddMenu)}
+                className="w-full py-3 border-2 border-dashed border-slate-700 rounded-lg text-slate-500 hover:border-blue-500 hover:text-blue-500 flex justify-center items-center gap-2 transition-colors"
+              >
+                <Plus size={20} /> Add Module
+              </button>
+
+              {showAddMenu && (
+                <div className="absolute bottom-full left-0 w-full mb-2 bg-slate-800 border border-slate-600 rounded-lg shadow-xl max-h-64 overflow-y-auto z-10">
+                  {MODULE_DEFINITIONS.map(def => (
+                    <button
+                      key={def.name}
+                      onClick={() => handleAddModule(def)}
+                      className="w-full text-left px-4 py-2 hover:bg-slate-700 text-sm text-slate-200 flex justify-between items-center"
+                    >
+                      <span className="capitalize">{def.name.replace('_', ' ')}</span>
+                      <span className="text-xs text-slate-500">{def.description}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="w-full md:w-12 lg:w-12 flex items-center justify-center border-r border-slate-700 bg-[#1e293b]">
+          <button
+            onClick={() => setShowSidebar(true)}
+            className="p-2 text-slate-300 hover:text-white"
+            title="Expand sidebar"
+          >
+            <PanelLeftOpen size={20} />
+          </button>
+        </div>
+      )}
 
       {/* MAIN AREA */}
       <div className="flex-1 flex flex-col min-h-0 relative">
@@ -379,7 +415,7 @@ export default function App() {
               )}
             </div>
           </div>
-          <div className="w-full max-w-4xl relative z-0 flex flex-col gap-4">
+          <div className="w-full max-w-5xl relative z-0 flex flex-col gap-4">
             <div className="flex justify-center">
               <ContextSelector
                 contexts={PREDEFINED_CONTEXTS}

@@ -88,6 +88,7 @@ export interface PreviewContext {
   id: string;
   name: string;
   path: string;
+  readOnly?: boolean;
   git?: {
     branch: string;
     status: string;
@@ -96,6 +97,9 @@ export interface PreviewContext {
   cmd_duration?: number;
   time?: string;
   docker_context?: string;
+  container?: {
+    name: string;
+  };
   package?: {
     version: string;
   };
