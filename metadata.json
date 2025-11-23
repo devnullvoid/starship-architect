@@ -1,0 +1,5 @@
+{
+  "name": "Starship Architect",
+  "description": "A visual builder for Starship.rs shell prompts. Construct your prompt using a drag-and-drop interface, customize colors and symbols, and preview changes in real-time. Features AI-powered config generation.",
+  "requestFramePermissions": []
+}
