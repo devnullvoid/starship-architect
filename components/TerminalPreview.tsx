@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActiveModule, Theme, PreviewContext } from '../types';
 import { MOCK_DATA, MODULE_DEFINITIONS } from '../constants';
-import { parseFormatString } from '../utils/starship';
+import { parseFormatString, parseStyle } from '../utils/starship';
 
 interface TerminalPreviewProps {
   modules: ActiveModule[];
@@ -66,6 +66,26 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
               return <div key={mod.id} className="w-full h-0 basis-full my-1"></div>;
             }
 
+            if (mod.type === 'fill') {
+              // Fill module should push remaining content to the right
+              // We can achieve this by making this element grow
+              // Also render the symbol repeated to fill the space
+              const def = MODULE_DEFINITIONS.find(d => d.name === 'fill');
+              const symbol = mod.properties.symbol || def?.defaultProps.symbol || ' ';
+              const style = mod.properties.style || def?.defaultProps.style || '';
+              const parsedStyle = parseStyle(style, theme);
+
+              return (
+                <div
+                  key={mod.id}
+                  className="flex-grow overflow-hidden whitespace-nowrap select-none"
+                  style={{ ...parsedStyle, minWidth: '1rem' }}
+                >
+                  {symbol.repeat(200)}
+                </div>
+              );
+            }
+
             const def = MODULE_DEFINITIONS.find(d => d.name === mod.type);
             if (!def) return null;
 
@@ -80,12 +100,16 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
             def.variables.forEach(v => {
               const propKey = v.substring(1);
 
-              // Special handling for 'character' module: 
+              // Special handling for 'character' module:
               // The $symbol variable is derived from success_symbol (or error_symbol) configuration,
               // NOT from mock data or a direct 'symbol' property.
               if (mod.type === 'character' && v === '$symbol') {
                 // We assume success state for the preview
                 variables[v] = mod.properties.success_symbol || def.defaultProps.success_symbol || '❯';
+              }
+              // OS Module - Mock Arch Linux
+              else if (mod.type === 'os' && v === '$symbol') {
+                variables[v] = ' '; // Arch Linux symbol
               }
               // Context-aware overrides
               else if (mod.type === 'directory' && v === '$path') {
