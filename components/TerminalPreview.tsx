@@ -73,10 +73,15 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
     let visible = substituted;
     if (truncLen && substituted.length > truncLen) {
       visible = substituted.slice(substituted.length - truncLen);
-      return `${prefix}${truncSymbol}${visible.join('/')}`;
+      if (hasHome) return `~/${truncSymbol}${visible.join('/')}`;
+      if (hasRoot) return `/${truncSymbol}${visible.join('/')}`;
+      return `${truncSymbol}${visible.join('/')}`;
     }
 
-    return `${prefix}${visible.join('/') || (hasRoot ? '' : '')}`;
+    const body = visible.join('/');
+    if (hasHome) return body ? `~/${body}` : '~';
+    if (hasRoot) return body ? `/${body}` : '/';
+    return body;
   };
 
   return (
@@ -183,6 +188,9 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
               else if (mod.type === 'git_status' && (v === '$all_status' || v === '$ahead_behind')) {
                 // Simplified git status for preview
                 variables[v] = context.git?.status || '';
+              }
+              else if (mod.type === 'docker_context' && v === '$name') {
+                variables[v] = context.docker_context || '';
               }
               else if (context.languages?.[mod.type] && v === '$version') {
                 variables[v] = context.languages[mod.type];
