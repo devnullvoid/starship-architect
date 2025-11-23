@@ -62,99 +62,179 @@ export const parseFormatString = (
   formatStr: string,
   variables: Record<string, string>,
   moduleStyle: string,
-  theme?: Theme,
-  depth: number = 0
+  theme?: Theme
 ) => {
   if (!formatStr) return [];
-  if (depth > 10) return [{ text: formatStr, style: {} }]; // Prevent infinite recursion
 
-  let currentFormat = formatStr;
+  // Resolve Starship-style optional groups: text wrapped in parentheses only renders
+  // when at least one variable inside is non-empty. The parentheses themselves are not rendered.
+  const resolveOptionalGroups = (str: string): string => {
+    let result = '';
+    for (let i = 0; i < str.length; i++) {
+      const char = str[i];
 
-  // Perform variable substitution and escape cleanup only at the top level
-  // (or if we assume the input string hasn't been processed yet, but here we process the whole string first)
-  if (depth === 0) {
-    // 1. Explicitly replace $style first, as it's a config variable, not a content variable
-    currentFormat = currentFormat.split('$style').join(moduleStyle || '');
+      // Handle escape
+      if (char === '\\') {
+        if (i + 1 < str.length) {
+          result += str[i + 1];
+          i++;
+        } else {
+          result += char;
+        }
+        continue;
+      }
 
-    // 2. Substitute all other variables
-    Object.entries(variables).forEach(([key, val]) => {
-      currentFormat = currentFormat.split(key).join(val || '');
-    });
+      if (char === '(') {
+        // If this paren directly follows a style block opener (e.g., "]("),
+        // leave it untouched so style parsing works.
+        let prev = i - 1;
+        while (prev >= 0 && /\s/.test(str[prev])) prev--;
+        if (prev >= 0 && str[prev] === ']') {
+          result += char;
+          continue;
+        }
 
-    // 3. Clean up escape characters (e.g. \[ becomes [, \) becomes ))
-    currentFormat = currentFormat.replace(/\\([\[\]\(\)])/g, '$1');
-  }
+        // Find matching ) respecting escapes and nesting
+        let depth = 0;
+        let j = i;
+        for (; j < str.length; j++) {
+          if (str[j] === '\\') { j++; continue; }
+          if (str[j] === '(') depth++;
+          else if (str[j] === ')') {
+            depth--;
+            if (depth === 0) break;
+          }
+        }
+
+        if (j < str.length) {
+          const inner = str.substring(i + 1, j);
+          // Determine if any variable inside has a non-empty value
+          const varMatches = [...inner.matchAll(/\$[a-zA-Z0-9_]+/g)] || [];
+          const shouldRender = varMatches.length === 0 || varMatches.some(m => {
+            const val = variables[m[0]];
+            return val !== undefined && val !== '';
+          });
+
+          if (shouldRender) {
+            result += resolveOptionalGroups(inner); // recurse for nested groups
+          }
+          i = j; // Skip past the closing paren
+          continue;
+        }
+      }
+
+      result += char;
+    }
+    return result;
+  };
+
+  let currentFormat = resolveOptionalGroups(formatStr);
+
+  // 1. Explicitly replace $style first, as it's a config variable, not a content variable
+  currentFormat = currentFormat.split('$style').join(moduleStyle || '');
+
+  // 2. Substitute all other variables
+  Object.entries(variables).forEach(([key, val]) => {
+    currentFormat = currentFormat.split(key).join(val || '');
+  });
 
   const result: { text: string; style: ParsedStyle }[] = [];
+  let buffer = '';
 
-  let remaining = currentFormat;
+  // Helper to find matching bracket index, respecting escapes and nesting
+  const findMatchingBracket = (str: string, start: number): number => {
+    let depth = 0;
+    for (let i = start; i < str.length; i++) {
+      if (str[i] === '\\') {
+        i++; // Skip next char
+        continue;
+      }
+      if (str[i] === '[') depth++;
+      else if (str[i] === ']') {
+        depth--;
+        if (depth === 0) return i;
+      }
+    }
+    return -1;
+  };
 
-  while (remaining.length > 0) {
-    const openIdx = remaining.indexOf('[');
+  // Helper to find closing paren for style, respecting escapes
+  const findClosingParen = (str: string, start: number): number => {
+    for (let i = start; i < str.length; i++) {
+      if (str[i] === '\\') {
+        i++;
+        continue;
+      }
+      if (str[i] === ')') return i;
+    }
+    return -1;
+  };
 
-    if (openIdx === -1) {
-      // No more style blocks
-      result.push({ text: remaining, style: {} });
-      break;
+  for (let i = 0; i < currentFormat.length; i++) {
+    const char = currentFormat[i];
+
+    if (char === '\\') {
+      // Escape sequence: treat next char as literal text
+      if (i + 1 < currentFormat.length) {
+        buffer += currentFormat[i + 1];
+        i++;
+      } else {
+        buffer += char; // Trailing backslash
+      }
+      continue;
     }
 
-    if (openIdx > 0) {
-      // Text before the block
-      result.push({ text: remaining.substring(0, openIdx), style: {} });
-      remaining = remaining.substring(openIdx);
-    }
+    if (char === '[') {
+      // Potential style block start
+      const closeBracketIdx = findMatchingBracket(currentFormat, i);
 
-    // Now remaining starts with [
-    // Find the matching ](...) pattern
-    let bracketDepth = 0;
-    let closeIdx = -1;
+      if (closeBracketIdx !== -1 && closeBracketIdx + 1 < currentFormat.length && currentFormat[closeBracketIdx + 1] === '(') {
+        // Found [...] followed by (
+        const styleStart = closeBracketIdx + 2;
+        const styleEnd = findClosingParen(currentFormat, styleStart);
 
-    for (let i = 0; i < remaining.length; i++) {
-      if (remaining[i] === '[') bracketDepth++;
-      else if (remaining[i] === ']') {
-        bracketDepth--;
-        if (bracketDepth === 0) {
-          // Found the closing bracket for the outer block
-          // Check if next char is (
-          if (i + 1 < remaining.length && remaining[i + 1] === '(') {
-            closeIdx = i;
-            break;
+        if (styleEnd !== -1) {
+          // Valid style block found!
+
+          // 1. Flush buffer
+          if (buffer) {
+            result.push({ text: buffer, style: {} });
+            buffer = '';
           }
+
+          // 2. Extract content and style
+          const content = currentFormat.substring(i + 1, closeBracketIdx);
+          const styleStr = currentFormat.substring(styleStart, styleEnd);
+
+          // 3. Parse style
+          const parsedStyleObj = parseStyle(styleStr, theme);
+
+          // 4. Recursively parse content
+          // We pass empty variables/style because they are already substituted in the content
+          const innerSegments = parseFormatString(content, {}, '', theme);
+
+          // 5. Merge styles
+          innerSegments.forEach(seg => {
+            result.push({
+              text: seg.text,
+              style: { ...parsedStyleObj, ...seg.style }
+            });
+          });
+
+          // 6. Advance index
+          i = styleEnd;
+          continue;
         }
       }
     }
 
-    if (closeIdx !== -1) {
-      // We found the closing ], check for style parens
-      const styleStart = closeIdx + 2; // after ](
-      const styleEnd = remaining.indexOf(')', styleStart);
+    // If not a style block or special char, add to buffer
+    buffer += char;
+  }
 
-      if (styleEnd !== -1) {
-        const content = remaining.substring(1, closeIdx);
-        const styleRaw = remaining.substring(styleStart, styleEnd);
-        const blockStyle = parseStyle(styleRaw, theme);
-
-        // Recursively parse the content
-        // We pass empty variables/style because they are already substituted in the content
-        const innerSegments = parseFormatString(content, {}, '', theme, depth + 1);
-
-        // Merge styles: inner segments' style overrides block style (or merges with it)
-        innerSegments.forEach(seg => {
-          result.push({
-            text: seg.text,
-            style: { ...blockStyle, ...seg.style }
-          });
-        });
-
-        remaining = remaining.substring(styleEnd + 1);
-        continue;
-      }
-    }
-
-    // If we get here, we didn't find a valid style block starting at openIdx
-    // Treat the [ as literal text and continue searching
-    result.push({ text: '[', style: {} });
-    remaining = remaining.substring(1);
+  // Flush remaining buffer
+  if (buffer) {
+    result.push({ text: buffer, style: {} });
   }
 
   return result;

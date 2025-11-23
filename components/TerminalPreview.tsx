@@ -60,10 +60,10 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
       <div className="p-6 min-h-[120px]">
         <div className="mb-2 select-none text-xs" style={{ color: theme.colors.gray }}># Live Preview</div>
 
-        <div className="flex flex-wrap items-center font-medium leading-snug">
+        <div className="flex flex-wrap items-center font-medium leading-normal whitespace-nowrap overflow-x-auto">
           {modules.filter(m => !m.disabled && shouldShowModule(m.type)).map((mod, idx) => {
             if (mod.type === 'line_break') {
-              return <div key={mod.id} className="w-full h-0 basis-full my-1"></div>;
+              return <div key={mod.id} className="basis-full w-full h-0 my-1"></div>;
             }
 
             if (mod.type === 'fill') {
@@ -79,9 +79,11 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
                 <div
                   key={mod.id}
                   className="flex-grow overflow-hidden whitespace-nowrap select-none"
-                  style={{ ...parsedStyle, minWidth: '1rem' }}
+                  style={{ ...parsedStyle, minWidth: 0, maxWidth: '100%' }}
                 >
-                  {symbol.repeat(200)}
+                  <span className="inline-block" style={{ minWidth: '100%' }}>
+                    {symbol.repeat(15)}
+                  </span>
                 </div>
               );
             }
@@ -145,7 +147,7 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
             const parsedSegments = parseFormatString(format, variables, style, theme);
 
             return (
-              <React.Fragment key={mod.id}>
+              <span key={mod.id} className="flex-none">
                 {parsedSegments.map((seg, i) => (
                   <span
                     key={i}
@@ -155,7 +157,7 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
                     {seg.text}
                   </span>
                 ))}
-              </React.Fragment>
+              </span>
             );
           })}
 
