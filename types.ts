@@ -83,3 +83,20 @@ export interface Theme {
     base17?: string;
   };
 }
+
+export interface PreviewContext {
+  id: string;
+  name: string;
+  path: string;
+  git?: {
+    branch: string;
+    status: string;
+  };
+  languages?: Record<string, string>; // e.g. { go: "1.21", node: "20.0" }
+  cmd_duration?: number;
+  time?: string;
+  docker_context?: string;
+  package?: {
+    version: string;
+  };
+}
