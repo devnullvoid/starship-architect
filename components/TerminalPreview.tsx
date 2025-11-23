@@ -12,16 +12,24 @@ interface TerminalPreviewProps {
 const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, context }) => {
   // Helper to check if a module should be visible in the current context
   const shouldShowModule = (type: string): boolean => {
-    if (type === 'git_branch' || type === 'git_status') {
+    if (type === 'git_branch' || type === 'git_status' || type === 'git_commit' || type === 'git_state' || type === 'git_metrics') {
       return !!context.git;
     }
     if (type === 'package') {
       return !!context.package;
     }
+    if (type === 'docker_context') {
+      return !!context.docker_context;
+    }
     // Language modules
-    if (['nodejs', 'golang', 'rust', 'python', 'java', 'kotlin', 'dotnet', 'terraform'].includes(type)) {
+    if (['nodejs', 'golang', 'rust', 'python', 'java', 'kotlin', 'dotnet', 'terraform', 'c', 'elixir', 'elm', 'haskell', 'julia', 'lua', 'nim', 'ocaml', 'perl', 'php', 'ruby', 'scala', 'swift', 'zig'].includes(type)) {
       return !!context.languages?.[type];
     }
+    // Container/Env modules - hide by default unless we have specific context for them
+    if (['nix_shell', 'conda', 'container', 'singularity', 'kubernetes', 'vcsh', 'fossil_branch', 'hg_branch', 'pijul_channel'].includes(type)) {
+      return false; // For now, we don't have mock data/context for these, so hide them to avoid clutter
+    }
+
     return true;
   };
 

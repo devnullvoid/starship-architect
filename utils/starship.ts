@@ -15,8 +15,15 @@ const resolveColor = (colorName: string, theme?: Theme): string => {
   if (normalized === 'magenta') normalized = 'purple'; // Alias commonly used in ANSI/Starship
 
   // Theme color lookup
-  if (theme && theme.colors[normalized as keyof typeof theme.colors]) {
-    return theme.colors[normalized as keyof typeof theme.colors];
+  if (theme) {
+    // Check named colors (red, blue, etc.)
+    if (theme.colors[normalized as keyof typeof theme.colors]) {
+      return theme.colors[normalized as keyof typeof theme.colors];
+    }
+    // Check palette colors (base00, base01, etc.)
+    if (theme.palette && theme.palette[colorName as keyof typeof theme.palette]) {
+      return theme.palette[colorName as keyof typeof theme.palette];
+    }
   }
 
   // Fallback for standard ANSI colors if no theme provided (though theme should always be provided)
