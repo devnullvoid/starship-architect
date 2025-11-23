@@ -6,7 +6,7 @@ import { load } from 'js-yaml';
 // Helper to resolve color based on theme or hex
 const resolveColor = (colorName: string, theme?: Theme): string => {
   if (!colorName) return 'inherit';
-  
+
   // Hex code
   if (colorName.startsWith('#')) return colorName;
 
@@ -39,8 +39,8 @@ export const parseStyle = (styleStr: string, theme?: Theme): ParsedStyle => {
       const color = part.replace('bg:', '');
       style.backgroundColor = resolveColor(color, theme);
     } else if (part.startsWith('fg:')) {
-        const color = part.replace('fg:', '');
-        style.color = resolveColor(color, theme);
+      const color = part.replace('fg:', '');
+      style.color = resolveColor(color, theme);
     } else {
       // Assume fg color if not prefixed
       style.color = resolveColor(part, theme);
@@ -75,10 +75,10 @@ export const parseFormatString = (
   });
 
   const result: { text: string; style: ParsedStyle }[] = [];
-  
+
   // Regex to capture [content](style) groups or plain text
   const regex = /\[(.*?)\]\((.*?)\)|([^\[]+)/g;
-  
+
   let match;
   while ((match = regex.exec(currentFormat)) !== null) {
     if (match[1] !== undefined) {
@@ -98,7 +98,7 @@ export const parseFormatString = (
     } else if (match[3] !== undefined) {
       // Plain text (outside of brackets)
       const content = match[3];
-      
+
       result.push({
         text: content,
         style: {} // Default terminal text color
@@ -143,8 +143,8 @@ export const generateTOML = (
 
   modules.forEach(mod => {
     if (mod.type === 'line_break') {
-        formatParts.push('$line_break');
-        return;
+      formatParts.push('$line_break');
+      return;
     }
 
     formatParts.push(`$${mod.type}`);
@@ -170,9 +170,9 @@ export const generateTOML = (
 
   // Global format string
   toml = `format = """\n${formatParts.join('')}\n"""\n` +
-         (config?.right_format ? `right_format = """\n${config.right_format}\n"""\n` : '') +
-         (config?.continuation_prompt ? `continuation_prompt = '${config.continuation_prompt}'\n` : '') +
-         '\n' + toml;
+    (config?.right_format ? `right_format = """\n${config.right_format}\n"""\n` : '') +
+    (config?.continuation_prompt ? `continuation_prompt = '${config.continuation_prompt}'\n` : '') +
+    '\n' + toml;
 
   // Add palettes if defined
   if (config?.palettes) {
@@ -195,55 +195,102 @@ export const parseTOMLToModules = (tomlString: string): ActiveModule[] => {
   try {
     const parsed = parse(tomlString) as Record<string, any>;
     const format = parsed.format as string;
-    
-    let moduleOrder: string[] = [];
-    
-    if (format) {
-      // Extract variables like $directory, $git_branch from format string
-      // A simple split by '$' and cleanup
-      moduleOrder = format.split('$')
-        .map(s => s.trim())
-        .filter(s => s.length > 0)
-        // Remove any surrounding text/punctuation from the format string part to just get the module name
-        // E.g. from "$directory\n" -> "directory"
-        .map(s => s.replace(/[^a-zA-Z0-9_].*/g, '')); 
-    } else {
-      // Fallback: just take keys that match module definitions
-      moduleOrder = Object.keys(parsed).filter(k => 
-        MODULE_DEFINITIONS.some(def => def.name === k)
-      );
-    }
 
     const modules: ActiveModule[] = [];
 
-    moduleOrder.forEach(modName => {
-      if (modName === 'line_break') {
+    if (format) {
+      // Tokenizer regex: matches $variable or literal text
+      // 1. $variable: \$([a-zA-Z0-9_]+)
+      // 2. Literal text: anything else until the next $
+      const regex = /\$([a-zA-Z0-9_]+)|([^$]+)/g;
+      let match;
+
+      while ((match = regex.exec(format)) !== null) {
+        if (match[1]) {
+          // It's a module variable (e.g. $directory)
+          const modName = match[1];
+
+          if (modName === 'line_break') {
+            modules.push({
+              id: Math.random().toString(36).substr(2, 9),
+              type: 'line_break',
+              disabled: false,
+              properties: {}
+            });
+            continue;
+          }
+
+          const def = MODULE_DEFINITIONS.find(d => d.name === modName);
+          if (def) {
+            const configProps = parsed[modName] || {};
+            modules.push({
+              id: Math.random().toString(36).substr(2, 9),
+              type: modName,
+              disabled: configProps.disabled === true,
+              properties: {
+                ...def.defaultProps,
+                ...configProps
+              }
+            });
+          }
+        } else if (match[2]) {
+          // It's a literal text segment (e.g. [](surface0))
+          // We create a 'text' module for this
+          const textContent = match[2];
+
+          // Try to parse [text](style) if present, otherwise raw text
+          // Note: The 'text' module's format is just '$text', so we pass the raw content as the 'text' property.
+          // However, if the content is complex (like multiple segments), we might want to just treat it as the format string itself?
+          // Actually, the 'text' module we added has format: '$text'. 
+          // If we put the entire segment into 'text' property, it will be rendered as is.
+          // But wait, if the segment is "[](surface0)", and we put that in 'text', 
+          // parseFormatString will eventually parse it again when rendering the module.
+
+          modules.push({
+            id: Math.random().toString(36).substr(2, 9),
+            type: 'text',
+            disabled: false,
+            properties: {
+              format: '$text',
+              text: textContent,
+              style: ''
+            }
+          });
+        }
+      }
+    } else {
+      // Fallback: just take keys that match module definitions
+      const moduleOrder = Object.keys(parsed).filter(k =>
+        MODULE_DEFINITIONS.some(def => def.name === k)
+      );
+
+      moduleOrder.forEach(modName => {
+        if (modName === 'line_break') {
+          modules.push({
+            id: Math.random().toString(36).substr(2, 9),
+            type: 'line_break',
+            disabled: false,
+            properties: {}
+          });
+          return;
+        }
+
+        const def = MODULE_DEFINITIONS.find(d => d.name === modName);
+        if (!def) return;
+
+        const configProps = parsed[modName] || {};
+
         modules.push({
           id: Math.random().toString(36).substr(2, 9),
-          type: 'line_break',
-          disabled: false,
-          properties: {}
+          type: modName,
+          disabled: configProps.disabled === true,
+          properties: {
+            ...def.defaultProps,
+            ...configProps
+          }
         });
-        return;
-      }
-
-      const def = MODULE_DEFINITIONS.find(d => d.name === modName);
-      // Even if definition is missing (custom module), we might want to support it loosely,
-      // but for now let's stick to known modules to avoid breaking the UI.
-      if (!def) return;
-
-      const configProps = parsed[modName] || {};
-      
-      modules.push({
-        id: Math.random().toString(36).substr(2, 9),
-        type: modName,
-        disabled: configProps.disabled === true,
-        properties: {
-          ...def.defaultProps,
-          ...configProps
-        }
       });
-    });
+    }
 
     return modules;
 

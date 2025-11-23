@@ -1,0 +1,273 @@
+"$schema" = "https://starship.rs/config-schema.json"
+add_newline = true
+format = "[](fg:color_02)$os[](bg:color_03 fg:color_02)$directory[](bg:color_07 fg:color_03)$git_branch$git_status[](fg:color_07 bg:color_14)$c$rust$golang$nodejs$java$python$kotlin$dotnet$terraform$package[](fg:color_14 bg:color_15)$container$docker_context$nix_shell$conda[ ](fg:color_15)$fill[ ](fg:color_02)$cmd_duration$time[](fg:color_02)$line_break$character"
+palette = "default"
+
+[c]
+format = "[ $symbol ($version) ]($style)"
+style = "bg:color_14 fg:color_02"
+symbol = " "
+
+[character]
+disabled = false
+error_symbol = "[❯](bold fg:color_08)"
+success_symbol = "[❯](bold fg:color_11)"
+vimcmd_replace_one_symbol = "[❮](bold fg:color_13)"
+vimcmd_replace_symbol = "[❮](bold fg:color_13)"
+vimcmd_symbol = "[❮](bold fg:color_09)"
+vimcmd_visual_symbol = "[❮](bold fg:color_14)"
+
+[cmd_duration]
+disabled = false
+format = "[   $duration  ]($style)"
+min_time_to_notify = 5000
+show_milliseconds = true
+show_notifications = true
+style = "bg:color_02 fg:color_05 italic"
+
+[directory]
+format = "[ $path ]($style)"
+read_only = " 󰌾"
+style = "bg:color_03 fg:color_05"
+truncation_length = 5
+truncation_symbol = "󰝰 /"
+
+[directory.substitutions]
+Applications = "  "
+Desktop = "  "
+Dev = "  "
+Developer = " 󰲋 "
+Documents = " 󰈙 "
+Downloads = "  "
+Firefox = "  "
+Games = "  "
+GitHub = "  "
+Library = "  "
+Movies = "  "
+Music = "  "
+Pictures = "  "
+Projects = "  "
+Public = "  "
+Screenshots = " 󱣴 "
+Thunderbird = "  "
+Videos = "  "
+github = "  "
+source = "  "
+"~" = "  "
+"~/.config" = "  "
+
+[docker_context]
+format = "[ $symbol $name ]($style)"
+style = "bg:color_15 fg:color_02"
+symbol = " "
+
+[dotnet]
+format = "[ $symbol ($version) ]($style)"
+style = "bg:color_14 fg:color_02"
+symbol = " "
+
+[elixir]
+format = "[ $symbol ($version) ]($style)"
+style = "bg:color_14 fg:color_02"
+symbol = " "
+
+[elm]
+format = "[ $symbol ($version) ]($style)"
+style = "bg:color_14 fg:color_02"
+symbol = " "
+
+[fill]
+style = "fg:color_02"
+symbol = "·"
+
+[git_branch]
+format = "[ $symbol $branch ]($style)"
+style = "bg:color_07 fg:color_02 italic"
+symbol = ""
+
+[git_status]
+format = "([\\[$all_status$ahead_behind\\] ]($style))"
+style = "bg:color_07 fg:color_02 italic"
+
+[golang]
+format = "[ $symbol ($version) ]($style)"
+style = "bg:color_14 fg:color_02"
+symbol = " "
+
+[java]
+format = "[ $symbol ($version) ]($style)"
+style = "bg:color_14 fg:color_02"
+symbol = " "
+
+[kotlin]
+format = "[ $symbol ($version) ]($style)"
+style = "bg:color_14 fg:color_02"
+symbol = " "
+
+[line_break]
+disabled = false
+
+[nix_shell]
+format = "[ $symbol $name ]($style)"
+style = "bg:color_15 fg:color_02"
+symbol = " "
+
+[nodejs]
+format = "[ $symbol ($version) ]($style)"
+style = "bg:color_14 fg:color_02"
+symbol = " "
+
+[os]
+disabled = false
+style = "bg:color_02 fg:color_05"
+
+[os.symbols]
+AlmaLinux = "  "
+Alpaquita = "  "
+Alpine = "  "
+Amazon = "  "
+Android = "  "
+Arch = "  "
+Artix = "  "
+CachyOS = "  "
+CentOS = "  "
+Debian = "  "
+DragonFly = "  "
+Emscripten = "  "
+EndeavourOS = "  "
+Fedora = "  "
+FreeBSD = "  "
+Garuda = " 󰛓 "
+Gentoo = "  "
+HardenedBSD = " 󰞌 "
+Illumos = " 󰈸 "
+Kali = "  "
+Linux = "  "
+Mabox = "  "
+Macos = "  "
+Manjaro = "  "
+Mariner = "  "
+MidnightBSD = "  "
+Mint = "  "
+NetBSD = "  "
+NixOS = "  "
+Nobara = "  "
+OpenBSD = " 󰈺 "
+OracleLinux = " 󰌷 "
+Pop = "  "
+Raspbian = "  "
+RedHatEnterprise = "  "
+Redhat = "  "
+Redox = " 󰀘 "
+RockyLinux = "  "
+SUSE = "  "
+Solus = " 󰠳 "
+Ubuntu = "  "
+Unknown = "  "
+Void = "  "
+Windows = " 󰍲 "
+openSUSE = "  "
+
+[package]
+format = "[ $symbol ($version) ]($style)"
+style = "bg:color_14 fg:color_02"
+symbol = "󰏗 "
+
+[palettes.base16]
+base00 = "#1e1e2e"
+base01 = "#181825"
+base02 = "#313244"
+base03 = "#45475a"
+base04 = "#585b70"
+base05 = "#cdd6f4"
+base06 = "#f5e0dc"
+base07 = "#b4befe"
+base08 = "#f38ba8"
+base09 = "#fab387"
+base0A = "#f9e2af"
+base0B = "#a6e3a1"
+base0C = "#94e2d5"
+base0D = "#89b4fa"
+base0E = "#cba6f7"
+base0F = "#f2cdcd"
+base10 = "#181825"
+base11 = "#11111b"
+base12 = "#eba0ac"
+base13 = "#f5e0dc"
+base14 = "#a6e3a1"
+base15 = "#89dceb"
+base16 = "#74c7ec"
+base17 = "#f5c2e7"
+black = "#1e1e2e"
+blue = "#89b4fa"
+bright-black = "#45475a"
+bright-blue = "#74c7ec"
+bright-cyan = "#89dceb"
+bright-green = "#a6e3a1"
+bright-magenta = "#f5c2e7"
+bright-purple = "#f5c2e7"
+bright-red = "#eba0ac"
+bright-white = "#b4befe"
+bright-yellow = "#f5e0dc"
+brown = "#f2cdcd"
+cyan = "#94e2d5"
+green = "#a6e3a1"
+magenta = "#cba6f7"
+orange = "#fab387"
+purple = "#cba6f7"
+red = "#f38ba8"
+white = "#cdd6f4"
+yellow = "#f9e2af"
+
+[palettes.default]
+color_00 = "#1e1e2e"
+color_01 = "#181825"
+color_02 = "#313244"
+color_03 = "#45475a"
+color_04 = "#585b70"
+color_05 = "#cdd6f4"
+color_06 = "#f5e0dc"
+color_07 = "#b4befe"
+color_08 = "#f38ba8"
+color_09 = "#fab387"
+color_10 = "#f9e2af"
+color_11 = "#a6e3a1"
+color_12 = "#94e2d5"
+color_13 = "#89b4fa"
+color_14 = "#cba6f7"
+color_15 = "#f2cdcd"
+color_16 = "#181825"
+color_17 = "#11111b"
+color_18 = "#eba0ac"
+color_19 = "#f5e0dc"
+color_20 = "#a6e3a1"
+color_21 = "#89dceb"
+color_22 = "#74c7ec"
+color_23 = "#f5c2e7"
+
+[python]
+format = "[ $symbol ($version) ]($style)"
+style = "bg:color_14 fg:color_02"
+symbol = " "
+
+[rust]
+format = "[ $symbol ($version) ]($style)"
+style = "bg:color_14 fg:color_02"
+symbol = " "
+
+[terraform]
+format = "[ $symbol ($version) ]($style)"
+style = "bg:color_14 fg:color_02"
+symbol = "󱁢 "
+
+[time]
+disabled = false
+format = "[[  $time ](fg:color_10 bg:color_02)]($style)"
+style = "bg:color_02"
+time_format = "%T"
+
+[username]
+format = "[ $user ]($style)"
+show_always = false
+style_root = "bg:color_03 fg:color_05"
+style_user = "bg:color_03 fg:color_05"

@@ -1,57 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Starship Architect</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load JetBrains Mono Nerd Font -->
-    <link href="https://cdn.jsdelivr.net/gh/mshaugh/nerdfont-webfonts@master/fonts/JetBrainsMono/stylesheet.css" rel="stylesheet" />
-    <style>
-      :root {
-        --font-mono: 'JetBrainsMono Nerd Font', 'JetBrains Mono', 'Fira Code', monospace;
-      }
-    </style>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              mono: ['var(--font-mono)', 'monospace'],
-              sans: ['"Inter"', 'sans-serif'],
-            },
-            colors: {
-              terminal: {
-                bg: '#1e1e1e',
-                fg: '#d4d4d4',
-                accent: '#3b82f6'
-              }
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Starship Architect</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Load JetBrains Mono Nerd Font -->
+  <!-- Load JetBrains Mono Nerd Font -->
+  <style>
+    @font-face {
+      font-family: 'JetBrainsMono Nerd Font';
+      src: url('https://cdn.jsdelivr.net/gh/ryanoasis/nerd-fonts@v3.3.0/patched-fonts/JetBrainsMono/Ligatures/Regular/JetBrainsMonoNerdFont-Regular.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'JetBrainsMono Nerd Font';
+      src: url('https://cdn.jsdelivr.net/gh/ryanoasis/nerd-fonts@v3.3.0/patched-fonts/JetBrainsMono/Ligatures/Bold/JetBrainsMonoNerdFont-Bold.ttf') format('truetype');
+      font-weight: bold;
+      font-style: normal;
+    }
+
+    :root {
+      --font-mono: 'JetBrainsMono Nerd Font', 'JetBrains Mono', 'Fira Code', monospace;
+    }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['var(--font-mono)', 'monospace'],
+            sans: ['"Inter"', 'sans-serif'],
+          },
+          colors: {
+            terminal: {
+              bg: '#1e1e1e',
+              fg: '#d4d4d4',
+              accent: '#3b82f6'
             }
           }
         }
       }
-    </script>
-    <style>
-      body {
-        background-color: #0f172a;
-        color: #e2e8f0;
-      }
-      /* Custom scrollbar for a sleeker look */
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #1e293b; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #475569; 
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #64748b; 
-      }
-    </style>
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0f172a;
+      color: #e2e8f0;
+    }
+
+    /* Custom scrollbar for a sleeker look */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+  </style>
   <script type="importmap">
 {
   "imports": {
@@ -66,8 +85,10 @@
 }
 </script>
 </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
-  </body>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+
 </html>

@@ -2,25 +2,25 @@ import { ModuleDefinition, Theme } from './types';
 
 export const COMMON_SYMBOLS = [
   { label: 'Arrow', value: '❯' },
-  { label: 'Triangle', value: '' },
-  { label: 'Git Branch', value: '' },
-  { label: 'Node.js', value: '' },
-  { label: 'Rust', value: '' },
-  { label: 'Python', value: '🐍' },
-  { label: 'Docker', value: '' },
-  { label: 'Package', value: '📦' },
+  { label: 'Triangle', value: '▶' },
+  { label: 'Git Branch', value: '' },
+  { label: 'Node.js', value: '󰎙' },
+  { label: 'Rust', value: '' },
+  { label: 'Python', value: '' },
+  { label: 'Docker', value: '' },
+  { label: 'Package', value: '' },
   { label: 'Error', value: '✖' },
   { label: 'Success', value: '✔' },
-  { label: 'Lock', value: '🔒' },
-  { label: 'Home', value: '' },
-  { label: 'Folder', value: '' },
-  { label: 'Time', value: '' },
+  { label: 'Lock', value: '󰌾' },
+  { label: 'Home', value: '' },
+  { label: 'Folder', value: '' },
+  { label: 'Time', value: '' },
   { label: 'Battery', value: '🔋' },
   { label: 'Cloud', value: '☁️' },
   { label: 'Kubernetes', value: '☸' },
-  { label: 'Go', value: '🐹' },
-  { label: 'Java', value: '☕' },
-  { label: 'Ruby', value: '💎' },
+  { label: 'Go', value: '' },
+  { label: 'Java', value: '' },
+  { label: 'Ruby', value: '' },
 ];
 
 export const THEMES: Theme[] = [
@@ -260,7 +260,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     defaultProps: {
       format: '[$path]($style)[$read_only]($read_only_style) ',
       style: 'cyan bold',
-      read_only: '🔒',
+      read_only: ' 󰌾',
       read_only_style: 'red',
       truncation_length: 3,
       truncation_symbol: '…/',
@@ -423,7 +423,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     description: 'Git branch',
     defaultProps: {
       format: 'on [$symbol$branch(:$remote_branch)]($style) ',
-      symbol: ' ',
+      symbol: ' ',
       style: 'purple bold',
       truncation_length: 9223372036854775807,
       truncation_symbol: '…',
@@ -535,7 +535,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     description: 'Node.js',
     defaultProps: {
       format: 'via [$symbol($version )]($style)',
-      symbol: ' ',
+      symbol: '󰎙 ',
       style: 'bold green',
     },
     variables: ['$symbol', '$version'],
@@ -545,7 +545,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     description: 'Python',
     defaultProps: {
       format: 'via [$symbol$pyenv_prefix($version )(\($virtualenv\) )]($style)',
-      symbol: '🐍 ',
+      symbol: ' ',
       style: 'yellow bold',
       pyenv_version_name: false,
       pyenv_prefix: 'pyenv ',
@@ -557,7 +557,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     description: 'Rust',
     defaultProps: {
       format: 'via [$symbol($version )]($style)',
-      symbol: ' ',
+      symbol: ' ',
       style: 'bold red',
     },
     variables: ['$symbol', '$version'],
@@ -567,7 +567,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     description: 'Go',
     defaultProps: {
       format: 'via [$symbol($version )]($style)',
-      symbol: '🐹 ',
+      symbol: ' ',
       style: 'bold cyan',
     },
     variables: ['$symbol', '$version'],
@@ -577,7 +577,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     description: 'Java',
     defaultProps: {
       format: 'via [$symbol($version )]($style)',
-      symbol: '☕ ',
+      symbol: ' ',
       style: 'red dimmed',
     },
     variables: ['$symbol', '$version'],
@@ -587,7 +587,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     description: 'Ruby',
     defaultProps: {
       format: 'via [$symbol($version )]($style)',
-      symbol: '💎 ',
+      symbol: ' ',
       style: 'bold red',
     },
     variables: ['$symbol', '$version'],
@@ -597,7 +597,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     description: 'PHP',
     defaultProps: {
       format: 'via [$symbol($version )]($style)',
-      symbol: '🐘 ',
+      symbol: ' ',
       style: '147 bold',
     },
     variables: ['$symbol', '$version'],
@@ -607,7 +607,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     description: '.NET',
     defaultProps: {
       format: 'via [$symbol($version )(🎯 $tfm )]($style)',
-      symbol: '.NET ',
+      symbol: ' ',
       style: 'blue bold',
     },
     variables: ['$symbol', '$version', '$tfm'],
@@ -617,7 +617,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     description: 'C/C++',
     defaultProps: {
       format: 'via [$symbol($version(-$name) )]($style)',
-      symbol: 'C ',
+      symbol: ' ',
       style: '149 bold',
     },
     variables: ['$symbol', '$version', '$name'],
@@ -689,7 +689,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     description: 'Kotlin',
     defaultProps: {
       format: 'via [$symbol($version )]($style)',
-      symbol: '🅺 ',
+      symbol: ' ',
       style: 'bold blue',
     },
     variables: ['$symbol', '$version'],
@@ -699,7 +699,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     description: 'Lua',
     defaultProps: {
       format: 'via [$symbol($version )]($style)',
-      symbol: '🌙 ',
+      symbol: ' ',
       style: 'bold blue',
     },
     variables: ['$symbol', '$version'],
@@ -951,7 +951,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     description: 'Package version',
     defaultProps: {
       format: 'is [$symbol$version]($style) ',
-      symbol: '📦 ',
+      symbol: ' ',
       style: '208 bold',
     },
     variables: ['$symbol', '$version'],
@@ -1063,7 +1063,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     description: 'Docker',
     defaultProps: {
       format: 'via [$symbol$context]($style) ',
-      symbol: ' ',
+      symbol: ' ',
       style: 'blue bold',
     },
     variables: ['$symbol', '$context'],
@@ -1106,7 +1106,7 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     description: 'Container',
     defaultProps: {
       format: '[$symbol \\[$name\\]]($style) ',
-      symbol: '⬢',
+      symbol: ' ',
       style: 'red bold dimmed',
     },
     variables: ['$symbol', '$name'],
@@ -1198,6 +1198,16 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     },
     variables: ['$symbol', '$output'],
   },
+  {
+    name: 'text',
+    description: 'Static Text',
+    defaultProps: {
+      format: '$text',
+      text: '',
+      style: '',
+    },
+    variables: ['$text'],
+  },
 ];
 
 // Mock data for previewing the prompt
@@ -1214,10 +1224,10 @@ export const MOCK_DATA: Record<string, any> = {
   },
   directory: {
     $path: '~/projects/starship-architect',
-    $read_only: '',
+    $read_only: ' 󰌾',
   },
   git_branch: {
-    $symbol: ' ',
+    $symbol: ' ',
     $branch: 'main',
     $remote_branch: 'origin/main',
   },
@@ -1248,42 +1258,42 @@ export const MOCK_DATA: Record<string, any> = {
     $deleted: '5',
   },
   nodejs: {
-    $symbol: ' ',
+    $symbol: '󰎙 ',
     $version: 'v20.10.0',
   },
   python: {
-    $symbol: '🐍 ',
+    $symbol: ' ',
     $version: '3.12.1',
     $virtualenv: 'venv',
     $pyenv_prefix: '',
   },
   rust: {
-    $symbol: ' ',
+    $symbol: ' ',
     $version: '1.75.0',
   },
   golang: {
-    $symbol: '🐹 ',
+    $symbol: ' ',
     $version: '1.21.5',
   },
   java: {
-    $symbol: '☕ ',
+    $symbol: ' ',
     $version: '21.0.1',
   },
   ruby: {
-    $symbol: '💎 ',
+    $symbol: ' ',
     $version: '3.2.2',
   },
   php: {
-    $symbol: '🐘 ',
+    $symbol: ' ',
     $version: '8.3.0',
   },
   dotnet: {
-    $symbol: '.NET ',
+    $symbol: ' ',
     $version: '8.0.100',
     $tfm: 'net8.0',
   },
   docker_context: {
-    $symbol: ' ',
+    $symbol: ' ',
     $context: 'default',
   },
   kubernetes: {
@@ -1327,7 +1337,7 @@ export const MOCK_DATA: Record<string, any> = {
     $number: '2',
   },
   package: {
-    $symbol: '📦 ',
+    $symbol: ' ',
     $version: '1.2.3',
   },
   terraform: {
