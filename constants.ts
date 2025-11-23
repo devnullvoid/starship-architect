@@ -2,20 +2,25 @@ import { ModuleDefinition, Theme } from './types';
 
 export const COMMON_SYMBOLS = [
   { label: 'Arrow', value: '❯' },
-  { label: 'Triangle', value: '' },
-  { label: 'Git Branch', value: '' },
-  { label: 'Node.js', value: '' },
-  { label: 'Rust', value: '' },
+  { label: 'Triangle', value: '' },
+  { label: 'Git Branch', value: '' },
+  { label: 'Node.js', value: '' },
+  { label: 'Rust', value: '' },
   { label: 'Python', value: '🐍' },
-  { label: 'Docker', value: '' },
+  { label: 'Docker', value: '' },
   { label: 'Package', value: '📦' },
   { label: 'Error', value: '✖' },
   { label: 'Success', value: '✔' },
   { label: 'Lock', value: '🔒' },
-  { label: 'Home', value: '' },
-  { label: 'Folder', value: '' },
-  { label: 'Time', value: '' },
+  { label: 'Home', value: '' },
+  { label: 'Folder', value: '' },
+  { label: 'Time', value: '' },
   { label: 'Battery', value: '🔋' },
+  { label: 'Cloud', value: '☁️' },
+  { label: 'Kubernetes', value: '☸' },
+  { label: 'Go', value: '🐹' },
+  { label: 'Java', value: '☕' },
+  { label: 'Ruby', value: '💎' },
 ];
 
 export const THEMES: Theme[] = [
@@ -107,9 +112,42 @@ export const THEMES: Theme[] = [
 ];
 
 export const MODULE_DEFINITIONS: ModuleDefinition[] = [
+  // Core/System Modules
+  {
+    name: 'character',
+    description: 'Prompt character',
+    defaultProps: {
+      format: '$symbol ',
+      success_symbol: '[❯](green bold)',
+      error_symbol: '[❯](red bold)',
+      vicmd_symbol: '[❮](green bold)',
+    },
+    variables: ['$symbol'],
+  },
+  {
+    name: 'username',
+    description: 'Current user name',
+    defaultProps: {
+      format: '[$user]($style) in ',
+      style: 'yellow bold',
+      show_always: false,
+    },
+    variables: ['$user'],
+  },
+  {
+    name: 'hostname',
+    description: 'System hostname',
+    defaultProps: {
+      format: '[$ssh_symbol$hostname]($style) in ',
+      style: 'green bold',
+      ssh_symbol: '🌐 ',
+      ssh_only: true,
+    },
+    variables: ['$hostname', '$ssh_symbol'],
+  },
   {
     name: 'directory',
-    description: 'Current working directory',
+    description: 'Current directory',
     defaultProps: {
       format: '[$path]($style)[$read_only]($read_only_style) ',
       style: 'cyan bold',
@@ -117,22 +155,202 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
       read_only_style: 'red',
       truncation_length: 3,
       truncation_symbol: '…/',
+      truncate_to_repo: true,
     },
     variables: ['$path', '$read_only'],
   },
   {
-    name: 'git_branch',
-    description: 'Active git branch',
+    name: 'cmd_duration',
+    description: 'Command duration',
     defaultProps: {
-      format: 'on [$symbol$branch]($style) ',
-      symbol: ' ',
-      style: 'purple bold',
+      format: 'took [$duration]($style) ',
+      style: 'yellow bold',
+      min_time: 2000,
     },
-    variables: ['$symbol', '$branch'],
+    variables: ['$duration'],
+  },
+  {
+    name: 'line_break',
+    description: 'Line break',
+    defaultProps: {},
+    variables: [],
+  },
+  {
+    name: 'status',
+    description: 'Exit status',
+    defaultProps: {
+      format: '[$symbol$status]($style) ',
+      symbol: '❌',
+      style: 'red bold',
+      disabled: true,
+    },
+    variables: ['$symbol', '$status'],
+  },
+  {
+    name: 'shell',
+    description: 'Active shell',
+    defaultProps: {
+      format: '[$indicator]($style) ',
+      bash_indicator: 'bsh',
+      fish_indicator: 'fsh',
+      zsh_indicator: 'zsh',
+      style: 'cyan bold',
+      disabled: true,
+    },
+    variables: ['$indicator'],
+  },
+  {
+    name: 'time',
+    description: 'Current time',
+    defaultProps: {
+      format: 'at [$time]($style) ',
+      style: 'bold yellow',
+      time_format: '%T',
+      disabled: true,
+    },
+    variables: ['$time'],
+  },
+  {
+    name: 'shlvl',
+    description: 'Shell level',
+    defaultProps: {
+      format: '[$symbol$shlvl]($style) ',
+      symbol: '↕️  ',
+      style: 'bold yellow',
+      threshold: 2,
+      disabled: true,
+    },
+    variables: ['$symbol', '$shlvl'],
+  },
+  {
+    name: 'jobs',
+    description: 'Background jobs',
+    defaultProps: {
+      format: '[$symbol$number]($style) ',
+      symbol: '✦',
+      style: 'bold blue',
+      number_threshold: 1,
+    },
+    variables: ['$symbol', '$number'],
+  },
+  {
+    name: 'battery',
+    description: 'Battery status',
+    defaultProps: {
+      format: '[$symbol$percentage]($style) ',
+      full_symbol: '🔋',
+      charging_symbol: '⚡',
+      discharging_symbol: '💀',
+      style: 'red bold',
+    },
+    variables: ['$symbol', '$percentage'],
+  },
+  {
+    name: 'env_var',
+    description: 'Environment variable',
+    defaultProps: {
+      format: 'with [$env_value]($style) ',
+      style: 'black bold dimmed',
+    },
+    variables: ['$env_value'],
+  },
+  {
+    name: 'sudo',
+    description: 'Sudo cached',
+    defaultProps: {
+      format: '[as $symbol]($style)',
+      symbol: '🧙 ',
+      style: 'bold blue',
+      disabled: true,
+    },
+    variables: ['$symbol'],
+  },
+  {
+    name: 'localip',
+    description: 'Local IP',
+    defaultProps: {
+      format: '[$localipv4]($style) ',
+      style: 'yellow bold',
+      ssh_only: true,
+      disabled: true,
+    },
+    variables: ['$localipv4'],
+  },
+  {
+    name: 'memory_usage',
+    description: 'Memory usage',
+    defaultProps: {
+      format: 'via [$symbol[$ram( | $swap)]($style) ',
+      symbol: '🐏 ',
+      style: 'white bold dimmed',
+      threshold: 75,
+      disabled: true,
+    },
+    variables: ['$symbol', '$ram', '$swap'],
+  },
+  {
+    name: 'os',
+    description: 'Operating system',
+    defaultProps: {
+      format: '[$symbol]($style)',
+      style: 'bold white',
+      disabled: true,
+    },
+    variables: ['$symbol'],
+  },
+  {
+    name: 'fill',
+    description: 'Fill space',
+    defaultProps: {
+      symbol: '.',
+      style: 'bold black',
+    },
+    variables: [],
+  },
+
+  // Git Modules
+  {
+    name: 'git_branch',
+    description: 'Git branch',
+    defaultProps: {
+      format: 'on [$symbol$branch(:$remote_branch)]($style) ',
+      symbol: ' ',
+      style: 'purple bold',
+      truncation_length: 9223372036854775807,
+      truncation_symbol: '…',
+    },
+    variables: ['$symbol', '$branch', '$remote_branch'],
+  },
+  {
+    name: 'git_commit',
+    description: 'Git commit',
+    defaultProps: {
+      format: '[\\($hash$tag\\)]($style) ',
+      style: 'green bold',
+      commit_hash_length: 7,
+      only_detached: true,
+    },
+    variables: ['$hash', '$tag'],
+  },
+  {
+    name: 'git_state',
+    description: 'Git state',
+    defaultProps: {
+      format: '\\([$state( $progress_current/$progress_total)]($style)\\) ',
+      style: 'yellow bold',
+      rebase: 'REBASING',
+      merge: 'MERGING',
+      revert: 'REVERTING',
+      cherry_pick: 'CHERRY-PICKING',
+      bisect: 'BISECTING',
+      am: 'AM',
+      am_or_rebase: 'AM/REBASE',
+    },
+    variables: ['$state', '$progress_current', '$progress_total'],
   },
   {
     name: 'git_status',
-    description: 'Git status symbols',
+    description: 'Git status',
     defaultProps: {
       format: '([$all_status$ahead_behind]($style) )',
       style: 'red bold',
@@ -147,127 +365,865 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
       renamed: '»',
       deleted: '✘',
     },
-    variables: ['$all_status', '$ahead_behind', '$conflicted', '$ahead', '$behind'],
+    variables: ['$all_status', '$ahead_behind', '$conflicted', '$ahead', '$behind', '$untracked', '$stashed', '$modified', '$staged', '$renamed', '$deleted'],
   },
+  {
+    name: 'git_metrics',
+    description: 'Git metrics',
+    defaultProps: {
+      format: '([+$added]($added_style) )([-$deleted]($deleted_style) )',
+      added_style: 'bold green',
+      deleted_style: 'bold red',
+      disabled: true,
+    },
+    variables: ['$added', '$deleted'],
+  },
+  {
+    name: 'hg_branch',
+    description: 'Mercurial branch',
+    defaultProps: {
+      format: 'on [$symbol$branch(:$topic)]($style) ',
+      symbol: ' ',
+      style: 'bold purple',
+    },
+    variables: ['$symbol', '$branch', '$topic'],
+  },
+  {
+    name: 'pijul_channel',
+    description: 'Pijul channel',
+    defaultProps: {
+      format: 'on [$symbol$channel]($style) ',
+      symbol: ' ',
+      style: 'bold purple',
+    },
+    variables: ['$symbol', '$channel'],
+  },
+  {
+    name: 'fossil_branch',
+    description: 'Fossil branch',
+    defaultProps: {
+      format: 'on [$symbol$branch]($style) ',
+      symbol: ' ',
+      style: 'bold purple',
+    },
+    variables: ['$symbol', '$branch'],
+  },
+  {
+    name: 'fossil_metrics',
+    description: 'Fossil metrics',
+    defaultProps: {
+      format: '([+$added]($added_style) )([-$deleted]($deleted_style) )',
+      added_style: 'bold green',
+      deleted_style: 'bold red',
+      disabled: true,
+    },
+    variables: ['$added', '$deleted'],
+  },
+
+  // Language Modules - Popular
   {
     name: 'nodejs',
-    description: 'Node.js version',
+    description: 'Node.js',
     defaultProps: {
-      format: 'via [$symbol($version)]($style) ',
-      symbol: ' ',
-      style: 'green bold',
-    },
-    variables: ['$symbol', '$version'],
-  },
-  {
-    name: 'rust',
-    description: 'Rust version',
-    defaultProps: {
-      format: 'via [$symbol($version)]($style) ',
-      symbol: ' ',
-      style: 'red bold',
+      format: 'via [$symbol($version )]($style)',
+      symbol: ' ',
+      style: 'bold green',
     },
     variables: ['$symbol', '$version'],
   },
   {
     name: 'python',
-    description: 'Python version',
+    description: 'Python',
     defaultProps: {
-      format: 'via [$symbol$pyenv_prefix($version)(\($virtualenv\))]($style) ',
+      format: 'via [$symbol$pyenv_prefix($version )(\($virtualenv\) )]($style)',
       symbol: '🐍 ',
       style: 'yellow bold',
+      pyenv_version_name: false,
+      pyenv_prefix: 'pyenv ',
     },
     variables: ['$symbol', '$version', '$virtualenv', '$pyenv_prefix'],
   },
   {
+    name: 'rust',
+    description: 'Rust',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: ' ',
+      style: 'bold red',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'golang',
+    description: 'Go',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🐹 ',
+      style: 'bold cyan',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'java',
+    description: 'Java',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '☕ ',
+      style: 'red dimmed',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'ruby',
+    description: 'Ruby',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '💎 ',
+      style: 'bold red',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'php',
+    description: 'PHP',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🐘 ',
+      style: '147 bold',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'dotnet',
+    description: '.NET',
+    defaultProps: {
+      format: 'via [$symbol($version )(🎯 $tfm )]($style)',
+      symbol: '.NET ',
+      style: 'blue bold',
+    },
+    variables: ['$symbol', '$version', '$tfm'],
+  },
+  {
+    name: 'c',
+    description: 'C/C++',
+    defaultProps: {
+      format: 'via [$symbol($version(-$name) )]($style)',
+      symbol: 'C ',
+      style: '149 bold',
+    },
+    variables: ['$symbol', '$version', '$name'],
+  },
+
+  // Language Modules - Additional
+  {
+    name: 'bun',
+    description: 'Bun',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🍞 ',
+      style: 'bold red',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'deno',
+    description: 'Deno',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🦕 ',
+      style: 'green bold',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'elixir',
+    description: 'Elixir',
+    defaultProps: {
+      format: 'via [$symbol($version \\(OTP $otp_version\\) )]($style)',
+      symbol: '💧 ',
+      style: 'bold purple',
+    },
+    variables: ['$symbol', '$version', '$otp_version'],
+  },
+  {
+    name: 'erlang',
+    description: 'Erlang',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: ' ',
+      style: 'bold red',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'haskell',
+    description: 'Haskell',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: 'λ ',
+      style: 'bold purple',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'julia',
+    description: 'Julia',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: 'ஃ ',
+      style: 'bold purple',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'kotlin',
+    description: 'Kotlin',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🅺 ',
+      style: 'bold blue',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'lua',
+    description: 'Lua',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🌙 ',
+      style: 'bold blue',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'nim',
+    description: 'Nim',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '👑 ',
+      style: 'bold yellow',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'ocaml',
+    description: 'OCaml',
+    defaultProps: {
+      format: 'via [$symbol($version )(\\($switch_indicator$switch_name\\) )]($style)',
+      symbol: '🐫 ',
+      style: 'bold yellow',
+    },
+    variables: ['$symbol', '$version', '$switch_indicator', '$switch_name'],
+  },
+  {
+    name: 'perl',
+    description: 'Perl',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🐪 ',
+      style: '149 bold',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'raku',
+    description: 'Raku',
+    defaultProps: {
+      format: 'via [$symbol($version-$vm_version )]($style)',
+      symbol: '🦋 ',
+      style: '149 bold',
+    },
+    variables: ['$symbol', '$version', '$vm_version'],
+  },
+  {
+    name: 'scala',
+    description: 'Scala',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🆂 ',
+      style: 'red bold',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'swift',
+    description: 'Swift',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🐦 ',
+      style: 'bold 202',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'zig',
+    description: 'Zig',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '↯ ',
+      style: 'bold yellow',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'vlang',
+    description: 'V',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: 'V ',
+      style: 'blue bold',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'crystal',
+    description: 'Crystal',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🔮 ',
+      style: 'bold red',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'dart',
+    description: 'Dart',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🎯 ',
+      style: 'bold blue',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'elm',
+    description: 'Elm',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🌳 ',
+      style: 'cyan bold',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'fennel',
+    description: 'Fennel',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🧅 ',
+      style: 'bold green',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'gleam',
+    description: 'Gleam',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '⭐ ',
+      style: 'bold #FFAFF3',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'purescript',
+    description: 'PureScript',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '<=> ',
+      style: 'bold white',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'rlang',
+    description: 'R',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '📐 ',
+      style: 'blue bold',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'red',
+    description: 'Red',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🔺 ',
+      style: 'red bold',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'solidity',
+    description: 'Solidity',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: 'S ',
+      style: 'bold blue',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'typst',
+    description: 'Typst',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: 't ',
+      style: '0087BD bold',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'cobol',
+    description: 'COBOL',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '⚙️  ',
+      style: 'bold blue',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'daml',
+    description: 'Daml',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: 'Λ ',
+      style: 'bold cyan',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'haxe',
+    description: 'Haxe',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '⌘ ',
+      style: 'bold fg:202',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'opa',
+    description: 'OPA',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🪖  ',
+      style: 'bold blue',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'quarto',
+    description: 'Quarto',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '⨁ ',
+      style: 'bold #75AADB',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'rye',
+    description: 'Rye',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🌾 ',
+      style: 'yellow bold',
+    },
+    variables: ['$symbol', '$version'],
+  },
+
+  // Package Managers / Build Tools
+  {
+    name: 'package',
+    description: 'Package version',
+    defaultProps: {
+      format: 'is [$symbol$version]($style) ',
+      symbol: '📦 ',
+      style: '208 bold',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'cmake',
+    description: 'CMake',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '△ ',
+      style: 'bold blue',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'conda',
+    description: 'Conda',
+    defaultProps: {
+      format: 'via [$symbol$environment]($style) ',
+      symbol: '🅒 ',
+      style: 'green bold',
+    },
+    variables: ['$symbol', '$environment'],
+  },
+  {
+    name: 'meson',
+    description: 'Meson',
+    defaultProps: {
+      format: 'via [$symbol$project]($style) ',
+      symbol: '⬢ ',
+      style: 'blue bold',
+    },
+    variables: ['$symbol', '$project'],
+  },
+  {
+    name: 'helm',
+    description: 'Helm',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '⎈ ',
+      style: 'bold white',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'gradle',
+    description: 'Gradle',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🅶 ',
+      style: 'bold bright-cyan',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'buf',
+    description: 'Buf',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '🐃 ',
+      style: 'bold blue',
+    },
+    variables: ['$symbol', '$version'],
+  },
+
+  // Cloud / Infrastructure
+  {
+    name: 'aws',
+    description: 'AWS',
+    defaultProps: {
+      format: 'on [$symbol($profile )(\\($region\\) )(\\[$duration\\] )]($style)',
+      symbol: '☁️  ',
+      style: 'bold yellow',
+    },
+    variables: ['$symbol', '$profile', '$region', '$duration'],
+  },
+  {
+    name: 'azure',
+    description: 'Azure',
+    defaultProps: {
+      format: 'on [$symbol($subscription )]($style)',
+      symbol: 'ﴃ ',
+      style: 'blue bold',
+    },
+    variables: ['$symbol', '$subscription'],
+  },
+  {
+    name: 'gcloud',
+    description: 'Google Cloud',
+    defaultProps: {
+      format: 'on [$symbol$account(@$domain)(\\($region\\))]($style) ',
+      symbol: '☁️  ',
+      style: 'bold blue',
+    },
+    variables: ['$symbol', '$account', '$domain', '$region', '$project'],
+  },
+  {
+    name: 'openstack',
+    description: 'OpenStack',
+    defaultProps: {
+      format: 'on [$symbol$cloud(\\($project\\))]($style) ',
+      symbol: '☁️  ',
+      style: 'bold yellow',
+    },
+    variables: ['$symbol', '$cloud', '$project'],
+  },
+  {
     name: 'docker_context',
-    description: 'Docker context',
+    description: 'Docker',
     defaultProps: {
       format: 'via [$symbol$context]($style) ',
-      symbol: ' ',
+      symbol: ' ',
       style: 'blue bold',
     },
     variables: ['$symbol', '$context'],
   },
   {
-    name: 'aws',
-    description: 'AWS profile',
+    name: 'kubernetes',
+    description: 'Kubernetes',
     defaultProps: {
-      format: 'on [$symbol($profile )(\($region\) )]($style)',
-      symbol: '☁️  ',
-      style: 'orange bold',
+      format: '[$symbol$context( \\($namespace\\))]($style) in ',
+      symbol: '☸ ',
+      style: 'cyan bold',
+      disabled: true,
     },
-    variables: ['$symbol', '$profile', '$region'],
+    variables: ['$symbol', '$context', '$namespace'],
   },
   {
-    name: 'cmd_duration',
-    description: 'Command duration',
+    name: 'terraform',
+    description: 'Terraform',
     defaultProps: {
-      format: 'took [$duration]($style) ',
+      format: 'via [$symbol$workspace]($style) ',
+      symbol: '💠 ',
+      style: 'bold 105',
+    },
+    variables: ['$symbol', '$workspace', '$version'],
+  },
+  {
+    name: 'pulumi',
+    description: 'Pulumi',
+    defaultProps: {
+      format: 'via [$symbol($username@)$stack]($style) ',
+      symbol: ' ',
+      style: 'bold 5',
+    },
+    variables: ['$symbol', '$stack', '$username', '$version'],
+  },
+
+  // Container / Virtualization
+  {
+    name: 'container',
+    description: 'Container',
+    defaultProps: {
+      format: '[$symbol \\[$name\\]]($style) ',
+      symbol: '⬢',
+      style: 'red bold dimmed',
+    },
+    variables: ['$symbol', '$name'],
+  },
+  {
+    name: 'singularity',
+    description: 'Singularity',
+    defaultProps: {
+      format: '[$symbol\\[$env\\]]($style) ',
+      symbol: '',
+      style: 'blue bold dimmed',
+    },
+    variables: ['$symbol', '$env'],
+  },
+  {
+    name: 'vagrant',
+    description: 'Vagrant',
+    defaultProps: {
+      format: 'via [$symbol($version )]($style)',
+      symbol: '⍱ ',
+      style: 'cyan bold',
+    },
+    variables: ['$symbol', '$version'],
+  },
+  {
+    name: 'nix_shell',
+    description: 'Nix shell',
+    defaultProps: {
+      format: 'via [$symbol$state( \\($name\\))]($style) ',
+      symbol: '❄️  ',
+      style: 'bold blue',
+      impure_msg: 'impure',
+      pure_msg: 'pure',
+    },
+    variables: ['$symbol', '$state', '$name'],
+  },
+  {
+    name: 'guix_shell',
+    description: 'Guix shell',
+    defaultProps: {
+      format: 'via [$symbol]($style) ',
+      symbol: '🐃 ',
       style: 'yellow bold',
     },
-    variables: ['$duration'],
-  },
-  {
-    name: 'line_break',
-    description: 'Inserts a line break',
-    defaultProps: {}, // Special handling
-    variables: [],
-  },
-  {
-    name: 'character',
-    description: 'The prompt character (usually at the end)',
-    defaultProps: {
-      format: '$symbol ',
-      success_symbol: '[❯](green bold)',
-      error_symbol: '[❯](red bold)',
-      vicmd_symbol: '[❮](green bold)',
-    },
     variables: ['$symbol'],
-  }
+  },
+  {
+    name: 'spack',
+    description: 'Spack',
+    defaultProps: {
+      format: 'via [$symbol$environment]($style) ',
+      symbol: '🅢 ',
+      style: 'blue bold',
+    },
+    variables: ['$symbol', '$environment'],
+  },
+
+  // Other Tools
+  {
+    name: 'direnv',
+    description: 'direnv',
+    defaultProps: {
+      format: '[$symbol$loaded/$allowed]($style) ',
+      symbol: '📂 ',
+      style: 'bold orange',
+      disabled: true,
+    },
+    variables: ['$symbol', '$loaded', '$allowed'],
+  },
+  {
+    name: 'vcsh',
+    description: 'vcsh',
+    defaultProps: {
+      format: 'vcsh [$symbol$repo]($style) ',
+      symbol: '',
+      style: 'bold yellow',
+    },
+    variables: ['$symbol', '$repo'],
+  },
+
+  // Custom
+  {
+    name: 'custom',
+    description: 'Custom module',
+    defaultProps: {
+      format: '[$symbol($output )]($style)',
+      symbol: '',
+      style: 'green bold',
+    },
+    variables: ['$symbol', '$output'],
+  },
 ];
 
 // Mock data for previewing the prompt
 export const MOCK_DATA: Record<string, any> = {
+  character: {
+    $symbol: '❯',
+  },
+  username: {
+    $user: 'developer',
+  },
+  hostname: {
+    $hostname: 'workstation',
+    $ssh_symbol: '🌐 ',
+  },
   directory: {
     $path: '~/projects/starship-architect',
-    $read_only: '🔒',
+    $read_only: '',
   },
   git_branch: {
-    $symbol: ' ',
+    $symbol: ' ',
     $branch: 'main',
+    $remote_branch: 'origin/main',
+  },
+  git_commit: {
+    $hash: '8c9acbe',
+    $tag: '',
+  },
+  git_state: {
+    $state: 'REBASING',
+    $progress_current: '2',
+    $progress_total: '5',
   },
   git_status: {
-    $all_status: '!',
+    $all_status: '!?',
     $ahead_behind: '⇡1',
+    $conflicted: '',
+    $ahead: '⇡1',
+    $behind: '',
+    $untracked: '?',
+    $stashed: '',
+    $modified: '!',
+    $staged: '+',
+    $renamed: '',
+    $deleted: '',
+  },
+  git_metrics: {
+    $added: '12',
+    $deleted: '5',
   },
   nodejs: {
-    $symbol: ' ',
-    $version: 'v18.16.0',
-  },
-  rust: {
-    $symbol: ' ',
-    $version: '1.70.0',
+    $symbol: ' ',
+    $version: 'v20.10.0',
   },
   python: {
     $symbol: '🐍 ',
-    $version: '3.11.3',
+    $version: '3.12.1',
     $virtualenv: 'venv',
     $pyenv_prefix: '',
   },
+  rust: {
+    $symbol: ' ',
+    $version: '1.75.0',
+  },
+  golang: {
+    $symbol: '🐹 ',
+    $version: '1.21.5',
+  },
+  java: {
+    $symbol: '☕ ',
+    $version: '21.0.1',
+  },
+  ruby: {
+    $symbol: '💎 ',
+    $version: '3.2.2',
+  },
+  php: {
+    $symbol: '🐘 ',
+    $version: '8.3.0',
+  },
+  dotnet: {
+    $symbol: '.NET ',
+    $version: '8.0.100',
+    $tfm: 'net8.0',
+  },
   docker_context: {
-    $symbol: ' ',
+    $symbol: ' ',
     $context: 'default',
+  },
+  kubernetes: {
+    $symbol: '☸ ',
+    $context: 'dev-cluster',
+    $namespace: 'default',
   },
   aws: {
     $symbol: '☁️  ',
-    $profile: 'dev-account',
+    $profile: 'dev',
     $region: 'us-east-1',
+    $duration: '2h',
+  },
+  azure: {
+    $symbol: 'ﴃ ',
+    $subscription: 'Production',
+  },
+  gcloud: {
+    $symbol: '☁️  ',
+    $account: 'user@example.com',
+    $domain: 'example.com',
+    $region: 'us-central1',
+    $project: 'my-project',
   },
   cmd_duration: {
-    $duration: '2s',
+    $duration: '2.5s',
   },
-  character: {
-    $symbol: '❯', // Changes based on success/error state simulation
-  }
+  time: {
+    $time: '13:37:42',
+  },
+  battery: {
+    $symbol: '🔋',
+    $percentage: '85%',
+  },
+  status: {
+    $symbol: '❌',
+    $status: '1',
+  },
+  jobs: {
+    $symbol: '✦',
+    $number: '2',
+  },
+  package: {
+    $symbol: '📦 ',
+    $version: '1.2.3',
+  },
+  terraform: {
+    $symbol: '💠 ',
+    $workspace: 'production',
+    $version: '1.6.5',
+  },
 };

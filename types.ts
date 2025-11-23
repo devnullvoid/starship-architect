@@ -1,6 +1,13 @@
 export interface StarshipConfig {
-  format: string;
-  add_newline: boolean;
+  format?: string;
+  right_format?: string;
+  continuation_prompt?: string;
+  add_newline?: boolean;
+  command_timeout?: number;
+  scan_timeout?: number;
+  follow_symlinks?: boolean;
+  palette?: string;
+  palettes?: Record<string, Record<string, string>>;
   [key: string]: any;
 }
 
