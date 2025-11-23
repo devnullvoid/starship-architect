@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { ActiveModule, Theme, PreviewContext } from '../types';
 import { MOCK_DATA, MODULE_DEFINITIONS } from '../constants';
 import { parseFormatString, parseStyle } from '../utils/starship';
@@ -10,6 +10,27 @@ interface TerminalPreviewProps {
 }
 
 const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, context }) => {
+  const rowRef = useRef<HTMLDivElement>(null);
+  const charMeasureRef = useRef<HTMLSpanElement>(null);
+  const [fillRepeat, setFillRepeat] = useState(60);
+
+  // Dynamically size $fill so it stretches but doesn't overflow the line.
+  useLayoutEffect(() => {
+    const updateFill = () => {
+      const row = rowRef.current;
+      const measure = charMeasureRef.current;
+      if (!row || !measure) return;
+
+      const rowWidth = row.clientWidth;
+      const charWidth = measure.offsetWidth || 8; // fallback average width
+      const target = Math.max(10, Math.ceil(rowWidth / Math.max(charWidth, 1)));
+      setFillRepeat(target);
+    };
+
+    updateFill();
+    window.addEventListener('resize', updateFill);
+    return () => window.removeEventListener('resize', updateFill);
+  }, []);
   // Helper to check if a module should be visible in the current context
   const shouldShowModule = (type: string): boolean => {
     if (type === 'git_branch' || type === 'git_status' || type === 'git_commit' || type === 'git_state' || type === 'git_metrics') {
@@ -60,16 +81,17 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
       <div className="p-6 min-h-[120px]">
         <div className="mb-2 select-none text-xs" style={{ color: theme.colors.gray }}># Live Preview</div>
 
-        <div className="flex flex-wrap items-center font-medium leading-normal whitespace-nowrap overflow-x-auto">
+        <div
+          ref={rowRef}
+          className="flex flex-wrap items-center font-medium leading-normal whitespace-nowrap overflow-x-auto"
+        >
           {modules.filter(m => !m.disabled && shouldShowModule(m.type)).map((mod, idx) => {
             if (mod.type === 'line_break') {
               return <div key={mod.id} className="basis-full w-full h-0 my-1"></div>;
             }
 
             if (mod.type === 'fill') {
-              // Fill module should push remaining content to the right
-              // We can achieve this by making this element grow
-              // Also render the symbol repeated to fill the space
+              // Fill grows and repeats symbol based on available row width
               const def = MODULE_DEFINITIONS.find(d => d.name === 'fill');
               const symbol = mod.properties.symbol || def?.defaultProps.symbol || ' ';
               const style = mod.properties.style || def?.defaultProps.style || '';
@@ -78,11 +100,21 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
               return (
                 <div
                   key={mod.id}
-                  className="flex-grow overflow-hidden whitespace-nowrap select-none"
-                  style={{ ...parsedStyle, minWidth: 0, maxWidth: '100%' }}
+                  className="overflow-hidden whitespace-nowrap select-none"
+                  style={{
+                    ...parsedStyle,
+                    flexGrow: 1,
+                    flexShrink: 1,
+                    flexBasis: 0,
+                    minWidth: 0,
+                    maxWidth: '100%',
+                  }}
                 >
-                  <span className="inline-block" style={{ minWidth: '100%' }}>
-                    {symbol.repeat(15)}
+                  <span
+                    className="inline-block"
+                    style={{ display: 'block', width: '100%', whiteSpace: 'nowrap', overflow: 'hidden' }}
+                  >
+                    {symbol.repeat(fillRepeat)}
                   </span>
                 </div>
               );
@@ -166,6 +198,10 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
             className="inline-block w-2.5 h-5 ml-1 animate-pulse align-middle"
             style={{ backgroundColor: theme.colors.fg }}
           ></span>
+          {/* Hidden measurer for dynamic fill sizing */}
+          <span ref={charMeasureRef} className="invisible absolute" aria-hidden>
+            ·
+          </span>
         </div>
       </div>
     </div>
