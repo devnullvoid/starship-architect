@@ -25,7 +25,8 @@ Build, customize, and preview your Starship prompt configuration with an intuiti
   - And many more!
 - **🎭 Theme System**:
   - 5 built-in themes (Default, Catppuccin Mocha, Tokyo Night, Gruvbox Dark, Dracula)
-  - Base16 YAML theme import support
+  - Full Base16/Base24 YAML theme import from [tinted-theming/schemes](https://github.com/tinted-theming/schemes)
+  - Palette embedding in starship.toml for portable configurations
 - **⚙️ Property Editor**: Fine-tune every aspect of each module
 - **📝 TOML Export**: Generate ready-to-use `starship.toml` configuration
 - **🔄 TOML Import**: Edit TOML directly and see changes reflected in the UI
@@ -108,8 +109,14 @@ Each module has configurable properties:
 ### Theme Support
 
 1. **Select Theme**: Use the theme dropdown in the preview area
-2. **Import Base16**: Click the upload icon to import Base16 YAML themes
-   - Find themes at [tinted-theming/schemes](https://github.com/tinted-theming/schemes)
+2. **Import Base16/Base24**: Click the upload icon to import theme YAML files
+   - Find 200+ themes at [tinted-theming/schemes](https://github.com/tinted-theming/schemes)
+   - Supports both Base16 (16 colors) and Base24 (24 colors)
+   - Example: [Catppuccin Mocha](https://raw.githubusercontent.com/tinted-theming/schemes/refs/heads/spec-0.11/base24/catppuccin-mocha.yaml)
+3. **Embed Palette**: Check "Embed" to include the color palette in your starship.toml
+   - Makes your configuration portable across systems
+   - Uses Starship's native palette system
+   - Allows using palette colors like `base08`, `base0D` in styles
 
 ### Exporting Configuration
 
@@ -178,6 +185,28 @@ username → hostname → directory → git_branch → git_status → git_metric
 docker_context → kubernetes → aws
 package → nodejs → python → golang → rust
 line_break → jobs → cmd_duration → character
+```
+
+### With Embedded Palette
+
+When you enable "Embed" with a theme, your starship.toml will include the palette:
+
+```toml
+format = """
+$directory$git_branch$character
+"""
+
+palette = 'catppuccin_mocha'
+
+[directory]
+style = 'bold base0D'  # Using palette color
+
+[palettes.catppuccin_mocha]
+base00 = '#1e1e2e'
+base01 = '#181825'
+base08 = '#f38ba8'
+base0D = '#89b4fa'
+# ... all palette colors
 ```
 
 ---

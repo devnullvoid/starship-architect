@@ -18,7 +18,7 @@ import { MODULE_DEFINITIONS, THEMES } from './constants';
 import { ActiveModule, ModuleDefinition, Theme } from './types';
 import TerminalPreview from './components/TerminalPreview';
 import PropertyEditor from './components/PropertyEditor';
-import { generateTOML, parseTOMLToModules, parseBase16Theme } from './utils/starship';
+import { generateTOML, parseTOMLToModules, parseBase16Theme, themeToStarshipPalette } from './utils/starship';
 import { generateConfigFromPrompt } from './services/geminiService';
 
 // Initial state with a basic setup
@@ -41,6 +41,7 @@ export default function App() {
   const [copyFeedback, setCopyFeedback] = useState(false);
   const [availableThemes, setAvailableThemes] = useState<Theme[]>(THEMES);
   const [activeTheme, setActiveTheme] = useState<Theme>(THEMES[0]);
+  const [embedPalette, setEmbedPalette] = useState(false);
   const [tomlContent, setTomlContent] = useState(generateTOML(INITIAL_MODULES));
   const [tomlError, setTomlError] = useState<string | null>(null);
   const [themeYamlInput, setThemeYamlInput] = useState('');
@@ -49,9 +50,17 @@ export default function App() {
   // Sync TOML content when modules change (only if not editing TOML directly to avoid loop)
   useEffect(() => {
     if (!showExport) {
-      setTomlContent(generateTOML(modules));
+      const config: any = {};
+      if (embedPalette && activeTheme.palette) {
+        const paletteName = activeTheme.name.toLowerCase().replace(/\s+/g, '_');
+        config.palette = paletteName;
+        config.palettes = {
+          [paletteName]: themeToStarshipPalette(activeTheme) || {}
+        };
+      }
+      setTomlContent(generateTOML(modules, config));
     }
-  }, [modules, showExport]);
+  }, [modules, showExport, embedPalette, activeTheme]);
 
   const handleAddModule = (def: ModuleDefinition) => {
     const newModule: ActiveModule = {
@@ -284,11 +293,11 @@ export default function App() {
         <div className="p-6 bg-[#0f172a] flex flex-col justify-center items-center min-h-[300px] relative border-b border-slate-800">
             <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-10">
                 <div className="text-slate-500 text-xs uppercase tracking-widest font-bold">Terminal Preview</div>
-                
+
                 {/* Theme Selector */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                     <Palette size={16} className="text-slate-400"/>
-                    <select 
+                    <select
                         value={activeTheme.name}
                         onChange={(e) => {
                             const t = availableThemes.find(theme => theme.name === e.target.value);
@@ -300,13 +309,24 @@ export default function App() {
                             <option key={t.name} value={t.name}>{t.name}</option>
                         ))}
                     </select>
-                    <button 
+                    <button
                         onClick={() => setShowThemeImport(true)}
                         className="p-1 text-slate-400 hover:text-white hover:bg-slate-700 rounded"
-                        title="Import Base16 Theme (YAML)"
+                        title="Import Base16/Base24 Theme (YAML)"
                     >
                         <Upload size={16} />
                     </button>
+                    {activeTheme.palette && (
+                        <label className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-300 cursor-pointer bg-slate-800 px-2 py-1 rounded border border-slate-600">
+                            <input
+                                type="checkbox"
+                                checked={embedPalette}
+                                onChange={(e) => setEmbedPalette(e.target.checked)}
+                                className="w-3 h-3"
+                            />
+                            <span title={`Embed ${activeTheme.name} palette in TOML config`}>Embed</span>
+                        </label>
+                    )}
                 </div>
             </div>
             <div className="w-full max-w-4xl relative z-0">
@@ -368,21 +388,24 @@ export default function App() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-slate-800 border border-slate-600 rounded-lg shadow-xl w-full max-w-lg flex flex-col max-h-[80vh]">
                 <div className="flex justify-between items-center p-4 border-b border-slate-700">
-                    <h3 className="font-bold text-white">Import Base16 Theme</h3>
+                    <h3 className="font-bold text-white">Import Base16/Base24 Theme</h3>
                     <button onClick={() => setShowThemeImport(false)} className="text-slate-400 hover:text-white">
                         <X size={20} />
                     </button>
                 </div>
                 <div className="p-4 flex-1 overflow-y-auto">
                     <p className="text-sm text-slate-400 mb-2">
-                        Paste a YAML Base16 scheme below. 
-                        You can find schemes at <a href="https://github.com/tinted-theming/schemes" target="_blank" className="text-blue-400 hover:underline">tinted-theming/schemes</a>.
+                        Paste a YAML Base16 or Base24 scheme below.
+                        Find schemes at <a href="https://github.com/tinted-theming/schemes" target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">tinted-theming/schemes</a>.
                     </p>
-                    <textarea 
+                    <p className="text-xs text-slate-500 mb-3">
+                        Supports both Base16 (16 colors) and Base24 (24 colors) formats. Enable "Embed" to include the palette in your starship.toml.
+                    </p>
+                    <textarea
                         value={themeYamlInput}
                         onChange={(e) => setThemeYamlInput(e.target.value)}
                         className="w-full h-64 bg-slate-900 border border-slate-600 rounded p-3 font-mono text-xs text-slate-200 focus:outline-none focus:border-blue-500"
-                        placeholder={`system: "base16"\nname: "My Theme"\npalette:\n  base00: "#1e1e2e"\n  base05: "#cdd6f4"\n  ...`}
+                        placeholder={`system: "base24"\nname: "My Theme"\nauthor: "Your Name"\nvariant: "dark"\npalette:\n  base00: "1e1e2e"\n  base01: "181825"\n  ...\n  base0F: "f2cdcd"\n  base10: "1e1e2e"  # Base24 only\n  ...\n  base17: "b4befe"  # Base24 only`}
                     />
                     {themeError && (
                         <div className="mt-2 text-red-400 text-xs bg-red-900/20 p-2 rounded border border-red-800">

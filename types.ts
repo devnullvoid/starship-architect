@@ -37,6 +37,9 @@ export interface ParsedStyle {
 
 export interface Theme {
   name: string;
+  author?: string;
+  variant?: 'dark' | 'light';
+  system?: 'base16' | 'base24';
   colors: {
     bg: string;
     fg: string;
@@ -50,5 +53,33 @@ export interface Theme {
     white: string;
     orange: string;
     gray: string;
+  };
+  // Raw Base16/Base24 palette for export
+  palette?: {
+    base00: string;
+    base01: string;
+    base02: string;
+    base03: string;
+    base04: string;
+    base05: string;
+    base06: string;
+    base07: string;
+    base08: string;
+    base09: string;
+    base0A: string;
+    base0B: string;
+    base0C: string;
+    base0D: string;
+    base0E: string;
+    base0F: string;
+    // Base24 additional colors
+    base10?: string;
+    base11?: string;
+    base12?: string;
+    base13?: string;
+    base14?: string;
+    base15?: string;
+    base16?: string;
+    base17?: string;
   };
 }

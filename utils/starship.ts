@@ -254,37 +254,98 @@ export const parseTOMLToModules = (tomlString: string): ActiveModule[] => {
 };
 
 /**
- * Parses a Base16 YAML string into a Theme object
+ * Ensures a color has a # prefix
+ */
+const ensureHexPrefix = (color: string): string => {
+  if (!color) return color;
+  return color.startsWith('#') ? color : `#${color}`;
+};
+
+/**
+ * Parses a Base16/Base24 YAML string into a Theme object
  */
 export const parseBase16Theme = (yamlString: string): Theme | null => {
   try {
     const parsed: any = load(yamlString);
     if (!parsed || !parsed.palette) {
-      console.warn("Invalid Base16 YAML format");
+      console.warn("Invalid Base16/Base24 YAML format");
       return null;
     }
 
     const p = parsed.palette;
-    
+    const system = parsed.system || 'base16';
+
+    // Build the palette object
+    const palette: any = {
+      base00: ensureHexPrefix(p.base00),
+      base01: ensureHexPrefix(p.base01),
+      base02: ensureHexPrefix(p.base02),
+      base03: ensureHexPrefix(p.base03),
+      base04: ensureHexPrefix(p.base04),
+      base05: ensureHexPrefix(p.base05),
+      base06: ensureHexPrefix(p.base06),
+      base07: ensureHexPrefix(p.base07),
+      base08: ensureHexPrefix(p.base08),
+      base09: ensureHexPrefix(p.base09),
+      base0A: ensureHexPrefix(p.base0A),
+      base0B: ensureHexPrefix(p.base0B),
+      base0C: ensureHexPrefix(p.base0C),
+      base0D: ensureHexPrefix(p.base0D),
+      base0E: ensureHexPrefix(p.base0E),
+      base0F: ensureHexPrefix(p.base0F),
+    };
+
+    // Add Base24 colors if present
+    if (system === 'base24' && p.base10) {
+      palette.base10 = ensureHexPrefix(p.base10);
+      palette.base11 = ensureHexPrefix(p.base11);
+      palette.base12 = ensureHexPrefix(p.base12);
+      palette.base13 = ensureHexPrefix(p.base13);
+      palette.base14 = ensureHexPrefix(p.base14);
+      palette.base15 = ensureHexPrefix(p.base15);
+      palette.base16 = ensureHexPrefix(p.base16);
+      palette.base17 = ensureHexPrefix(p.base17);
+    }
+
     return {
       name: parsed.name || 'Custom Theme',
+      author: parsed.author,
+      variant: parsed.variant || 'dark',
+      system: system as 'base16' | 'base24',
       colors: {
-        bg: p.base00,     // Default Background
-        fg: p.base05,     // Default Foreground
-        black: p.base01,  // Lighter Background (Used for status bars) / often used as ANSI Black
-        red: p.base08,
-        green: p.base0B,
-        yellow: p.base0A,
-        blue: p.base0D,
-        purple: p.base0E,
-        cyan: p.base0C,
-        white: p.base07,  // Light Background / White
-        orange: p.base09,
-        gray: p.base03,   // Comments / Gray
-      }
+        bg: palette.base00,     // Default Background
+        fg: palette.base05,     // Default Foreground
+        black: palette.base01,  // Lighter Background (Used for status bars)
+        red: palette.base08,
+        green: palette.base0B,
+        yellow: palette.base0A,
+        blue: palette.base0D,
+        purple: palette.base0E,
+        cyan: palette.base0C,
+        white: palette.base07,  // Light Background / White
+        orange: palette.base09,
+        gray: palette.base03,   // Comments / Gray
+      },
+      palette
     };
   } catch (error) {
     console.error("Failed to parse Theme YAML", error);
     return null;
   }
+};
+
+/**
+ * Converts a Theme's palette to a Starship palette format
+ */
+export const themeToStarshipPalette = (theme: Theme): Record<string, string> | null => {
+  if (!theme.palette) return null;
+
+  const palette: Record<string, string> = {};
+  Object.entries(theme.palette).forEach(([key, value]) => {
+    if (value) {
+      palette[key] = value;
+    }
+  });
+
+  return palette;
 };
