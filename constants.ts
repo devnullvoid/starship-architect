@@ -1,26 +1,82 @@
 import { ModuleDefinition, Theme } from './types';
 
 export const COMMON_SYMBOLS = [
+  // Powerline
+  { label: 'Right Arrow', value: '', isPowerline: true },
+  { label: 'Right Arrow Thin', value: '', isPowerline: true },
+  { label: 'Left Arrow', value: '', isPowerline: true },
+  { label: 'Left Arrow Thin', value: '', isPowerline: true },
+  { label: 'Round Right', value: '', isPowerline: true },
+  { label: 'Round Left', value: '', isPowerline: true },
+  { label: 'Flame', value: '', isPowerline: true },
+  { label: 'Pixelated', value: '', isPowerline: true },
+  { label: 'Trapezoid', value: '', isPowerline: true },
+
+  // Common
   { label: 'Arrow', value: '❯' },
   { label: 'Triangle', value: '▶' },
+  { label: 'Double Arrow', value: '»' },
+  { label: 'Line', value: '─' },
+  { label: 'Dot', value: '•' },
+
+  // Nerd Fonts - Dev
   { label: 'Git Branch', value: '' },
   { label: 'Node.js', value: '󰎙' },
   { label: 'Rust', value: '' },
   { label: 'Python', value: '' },
   { label: 'Docker', value: '' },
   { label: 'Package', value: '' },
-  { label: 'Error', value: '✖' },
-  { label: 'Success', value: '✔' },
-  { label: 'Lock', value: '󰌾' },
-  { label: 'Home', value: '' },
-  { label: 'Folder', value: '' },
-  { label: 'Time', value: '' },
-  { label: 'Battery', value: '🔋' },
-  { label: 'Cloud', value: '☁️' },
-  { label: 'Kubernetes', value: '☸' },
   { label: 'Go', value: '' },
   { label: 'Java', value: '' },
   { label: 'Ruby', value: '' },
+  { label: 'PHP', value: '' },
+  { label: 'C', value: '' },
+  { label: 'C#', value: '' },
+  { label: 'F#', value: '' },
+  { label: 'Haskell', value: '' },
+  { label: 'Lua', value: '' },
+  { label: 'Perl', value: '' },
+  { label: 'Swift', value: '' },
+  { label: 'Zig', value: '' },
+
+  // Nerd Fonts - System
+  { label: 'Home', value: '' },
+  { label: 'Folder', value: '' },
+  { label: 'Folder Open', value: '' },
+  { label: 'Lock', value: '󰌾' },
+  { label: 'Time', value: '' },
+  { label: 'Battery', value: '🔋' },
+  { label: 'Memory', value: '󰍛' },
+  { label: 'CPU', value: '' },
+  { label: 'Disk', value: '󰋊' },
+  { label: 'Network', value: '󰈀' },
+  { label: 'Search', value: '' },
+  { label: 'Terminal', value: '' },
+
+  // Nerd Fonts - OS
+  { label: 'Linux', value: '' },
+  { label: 'Apple', value: '' },
+  { label: 'Windows', value: '' },
+  { label: 'Android', value: '' },
+  { label: 'Arch', value: '' },
+  { label: 'Debian', value: '' },
+  { label: 'Ubuntu', value: '' },
+  { label: 'Fedora', value: '' },
+  { label: 'Nix', value: '' },
+
+  // Status
+  { label: 'Error', value: '✖' },
+  { label: 'Success', value: '✔' },
+  { label: 'Warning', value: '' },
+  { label: 'Info', value: '' },
+  { label: 'Question', value: '' },
+
+  // Misc
+  { label: 'Cloud', value: '☁️' },
+  { label: 'Kubernetes', value: '☸' },
+  { label: 'AWS', value: '' },
+  { label: 'Azure', value: 'ﴃ' },
+  { label: 'GCP', value: '' },
 ];
 
 export const THEMES: Theme[] = [

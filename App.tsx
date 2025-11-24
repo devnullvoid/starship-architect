@@ -463,6 +463,7 @@ export default function App() {
                   module={selectedModule}
                   onChange={handleUpdateModule}
                   onClose={() => setSelectedModuleId(null)}
+                  theme={activeTheme}
                 />
               ) : (
                 <div className="h-full flex flex-col items-center justify-center text-slate-500">
