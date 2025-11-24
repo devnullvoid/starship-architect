@@ -56,6 +56,10 @@ source = "  "
 "~" = "  "
 "~/.config" = "  "
 
+[container]
+format = "[ $symbol $name ]($style)"
+style="bg:base0F fg:base02"
+
 [docker_context]
 format = "[ $symbol $name ]($style)"
 style = "bg:base0F fg:base02"
