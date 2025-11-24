@@ -5,6 +5,7 @@ import { X, HelpCircle } from 'lucide-react';
 import GlyphPicker from './GlyphPicker';
 import ColorPicker from './ColorPicker';
 import KeyValueEditor from './KeyValueEditor';
+import FormatStringEditor from './FormatStringEditor';
 
 interface PropertyEditorProps {
     module: ActiveModule;
@@ -15,7 +16,8 @@ interface PropertyEditorProps {
 
 const PropertyEditor: React.FC<PropertyEditorProps> = ({ module, onChange, onClose, theme }) => {
     const definition = MODULE_DEFINITIONS.find(d => d.name === module.type);
-    const [activePopup, setActivePopup] = React.useState<{ type: 'glyph' | 'color', field: string } | null>(null);
+    const [activePopup, setActivePopup] = React.useState<{ type: 'glyph' | 'color', field: string, selection?: { start: number, end: number } } | null>(null);
+    const inputRefs = React.useRef<Record<string, HTMLInputElement | null>>({});
 
     if (!definition) return null;
 
@@ -29,7 +31,16 @@ const PropertyEditor: React.FC<PropertyEditorProps> = ({ module, onChange, onClo
     const handleGlyphSelect = (glyph: string) => {
         if (activePopup) {
             const currentValue = module.properties[activePopup.field] || '';
-            handleChange(activePopup.field, String(currentValue) + glyph);
+            const strValue = String(currentValue);
+
+            // Insert at cursor position if we have it, otherwise append
+            if (activePopup.selection) {
+                const { start, end } = activePopup.selection;
+                const newValue = strValue.slice(0, start) + glyph + strValue.slice(end);
+                handleChange(activePopup.field, newValue);
+            } else {
+                handleChange(activePopup.field, strValue + glyph);
+            }
             setActivePopup(null);
         }
     };
@@ -41,9 +52,41 @@ const PropertyEditor: React.FC<PropertyEditorProps> = ({ module, onChange, onClo
                 handleChange(activePopup.field, color);
             } else {
                 const currentValue = module.properties[activePopup.field] || '';
-                handleChange(activePopup.field, String(currentValue) + color);
+                const strValue = String(currentValue);
+
+                if (activePopup.selection) {
+                    const { start, end } = activePopup.selection;
+                    // If text is selected, wrap it: [text](style)
+                    // If no text selected (start===end), just insert the style string wrapped in (): (style)
+                    // The user requested: [text to style](fg:colorX bg:colorY styleZ)
+
+                    if (start !== end) {
+                        const selectedText = strValue.slice(start, end);
+                        const newValue = strValue.slice(0, start) + `[${selectedText}](${color})` + strValue.slice(end);
+                        handleChange(activePopup.field, newValue);
+                    } else {
+                        // No selection: insert (style) at cursor
+                        const newValue = strValue.slice(0, start) + `(${color})` + strValue.slice(end);
+                        handleChange(activePopup.field, newValue);
+                    }
+                } else {
+                    // Fallback if no selection info: append
+                    handleChange(activePopup.field, strValue + `(${color})`);
+                }
             }
         }
+    };
+
+    const openPopup = (type: 'glyph' | 'color', field: string) => {
+        const input = inputRefs.current[field];
+        let selection = undefined;
+        if (input) {
+            selection = {
+                start: input.selectionStart || 0,
+                end: input.selectionEnd || 0
+            };
+        }
+        setActivePopup({ type, field, selection });
     };
 
     const renderField = (field: string) => {
@@ -52,6 +95,19 @@ const PropertyEditor: React.FC<PropertyEditorProps> = ({ module, onChange, onClo
         const isBoolean = typeof value === 'boolean';
         const isNumber = typeof value === 'number';
         const isStyle = field.toLowerCase().includes('style');
+
+        if (field === 'format') {
+            return (
+                <div key={field} className="space-y-1">
+                    <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Format String</label>
+                    <FormatStringEditor
+                        value={String(value || '')}
+                        onChange={(newValue) => handleChange(field, newValue)}
+                        theme={theme}
+                    />
+                </div>
+            );
+        }
 
         if (isObject) {
             return (
@@ -85,6 +141,7 @@ const PropertyEditor: React.FC<PropertyEditorProps> = ({ module, onChange, onClo
                 <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{field.replace(/_/g, ' ')}</label>
                 <div className="relative flex gap-2">
                     <input
+                        ref={el => inputRefs.current[field] = el}
                         type={isNumber ? "number" : "text"}
                         value={value === undefined ? '' : value}
                         onChange={(e) => handleChange(field, isNumber ? Number(e.target.value) : e.target.value)}
@@ -97,7 +154,7 @@ const PropertyEditor: React.FC<PropertyEditorProps> = ({ module, onChange, onClo
                         <div className="flex gap-1">
                             {!isStyle && (
                                 <button
-                                    onClick={(e) => { e.stopPropagation(); setActivePopup({ type: 'glyph', field }); }}
+                                    onClick={(e) => { e.stopPropagation(); openPopup('glyph', field); }}
                                     className="px-2 bg-slate-700 hover:bg-slate-600 rounded text-slate-300 flex items-center justify-center"
                                     title="Insert Glyph"
                                 >
@@ -105,7 +162,7 @@ const PropertyEditor: React.FC<PropertyEditorProps> = ({ module, onChange, onClo
                                 </button>
                             )}
                             <button
-                                onClick={(e) => { e.stopPropagation(); setActivePopup({ type: 'color', field }); }}
+                                onClick={(e) => { e.stopPropagation(); openPopup('color', field); }}
                                 className="px-2 bg-slate-700 hover:bg-slate-600 rounded text-slate-300 flex items-center justify-center"
                                 title="Pick Color"
                             >

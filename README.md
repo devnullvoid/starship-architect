@@ -61,7 +61,7 @@ Build, customize, and preview your Starship prompt configuration with an intuiti
 
 4. **Open in browser**
    ```
-   http://localhost:5173
+   http://localhost:3000
    ```
 
 ### Optional: AI Features
