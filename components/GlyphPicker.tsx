@@ -63,7 +63,7 @@ const GlyphPicker: React.FC<GlyphPickerProps> = ({ onSelect, onClose }) => {
                     <button
                         key={s.value}
                         onClick={() => { onSelect(s.value); onClose(); }}
-                        className="aspect-square flex items-center justify-center text-lg hover:bg-slate-700 rounded text-slate-200 hover:text-white transition-colors"
+                        className="aspect-square flex items-center justify-center text-lg hover:bg-slate-700 rounded text-slate-200 hover:text-white transition-colors font-mono"
                         title={s.label}
                     >
                         {s.value}

@@ -28,14 +28,21 @@ const PropertyEditor: React.FC<PropertyEditorProps> = ({ module, onChange, onClo
 
     const handleGlyphSelect = (glyph: string) => {
         if (activePopup) {
-            handleChange(activePopup.field, glyph);
+            const currentValue = module.properties[activePopup.field] || '';
+            handleChange(activePopup.field, String(currentValue) + glyph);
             setActivePopup(null);
         }
     };
 
     const handleColorSelect = (color: string) => {
         if (activePopup) {
-            handleChange(activePopup.field, color);
+            const isStyle = activePopup.field.toLowerCase().includes('style');
+            if (isStyle) {
+                handleChange(activePopup.field, color);
+            } else {
+                const currentValue = module.properties[activePopup.field] || '';
+                handleChange(activePopup.field, String(currentValue) + color);
+            }
         }
     };
 
@@ -44,6 +51,7 @@ const PropertyEditor: React.FC<PropertyEditorProps> = ({ module, onChange, onClo
         const isObject = typeof value === 'object' && value !== null && !Array.isArray(value);
         const isBoolean = typeof value === 'boolean';
         const isNumber = typeof value === 'number';
+        const isStyle = field.toLowerCase().includes('style');
 
         if (isObject) {
             return (
@@ -87,13 +95,15 @@ const PropertyEditor: React.FC<PropertyEditorProps> = ({ module, onChange, onClo
                     {/* Pickers for string fields */}
                     {!isNumber && !isBoolean && (
                         <div className="flex gap-1">
-                            <button
-                                onClick={(e) => { e.stopPropagation(); setActivePopup({ type: 'glyph', field }); }}
-                                className="px-2 bg-slate-700 hover:bg-slate-600 rounded text-slate-300 flex items-center justify-center"
-                                title="Insert Glyph"
-                            >
-                                <span className="text-xs">Aa</span>
-                            </button>
+                            {!isStyle && (
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setActivePopup({ type: 'glyph', field }); }}
+                                    className="px-2 bg-slate-700 hover:bg-slate-600 rounded text-slate-300 flex items-center justify-center"
+                                    title="Insert Glyph"
+                                >
+                                    <span className="text-xs">Aa</span>
+                                </button>
+                            )}
                             <button
                                 onClick={(e) => { e.stopPropagation(); setActivePopup({ type: 'color', field }); }}
                                 className="px-2 bg-slate-700 hover:bg-slate-600 rounded text-slate-300 flex items-center justify-center"
