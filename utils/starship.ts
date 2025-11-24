@@ -109,7 +109,7 @@ export const parseFormatString = (
         if (j < str.length) {
           const inner = str.substring(i + 1, j);
           // Determine if any variable inside has a non-empty value
-          const varMatches = [...inner.matchAll(/\$[a-zA-Z0-9_]+/g)] || [];
+          const varMatches = Array.from(inner.matchAll(/\$[a-zA-Z0-9_]+/g));
           const shouldRender = varMatches.length === 0 || varMatches.some(m => {
             const val = variables[m[0]];
             return val !== undefined && val !== '';
