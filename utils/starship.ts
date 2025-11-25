@@ -279,6 +279,14 @@ export const generateTOML = (
       return;
     }
 
+    if (mod.type === 'text') {
+      // Text modules are just literals in the format string
+      // We use the 'format' property which contains the raw string (e.g. "[](surface0)")
+      const textContent = mod.properties.format || '';
+      formatParts.push(textContent);
+      return;
+    }
+
     formatParts.push(`$${mod.type}`);
 
     // Generate section
@@ -301,7 +309,7 @@ export const generateTOML = (
   });
 
   // Global format string
-  toml = `format = """\n${formatParts.join('')}\n"""\n` +
+  toml = `format = """\n${formatParts.join('')}"""\n` +
     (config?.right_format ? `right_format = """\n${config.right_format}\n"""\n` : '') +
     (config?.continuation_prompt ? `continuation_prompt = '${config.continuation_prompt}'\n` : '') +
     '\n' + toml;
@@ -370,22 +378,12 @@ export const parseTOMLToModules = (tomlString: string): ActiveModule[] => {
           // We create a 'text' module for this
           const textContent = match[2];
 
-          // Try to parse [text](style) if present, otherwise raw text
-          // Note: The 'text' module's format is just '$text', so we pass the raw content as the 'text' property.
-          // However, if the content is complex (like multiple segments), we might want to just treat it as the format string itself?
-          // Actually, the 'text' module we added has format: '$text'. 
-          // If we put the entire segment into 'text' property, it will be rendered as is.
-          // But wait, if the segment is "[](surface0)", and we put that in 'text', 
-          // parseFormatString will eventually parse it again when rendering the module.
-
           modules.push({
             id: Math.random().toString(36).substr(2, 9),
             type: 'text',
             disabled: false,
             properties: {
-              format: '$text',
-              text: textContent,
-              style: ''
+              format: textContent
             }
           });
         }

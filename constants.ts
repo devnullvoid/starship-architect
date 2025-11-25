@@ -474,6 +474,14 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     },
     variables: [],
   },
+  {
+    name: 'text',
+    description: 'Static text or symbols',
+    defaultProps: {
+      format: '',
+    },
+    variables: [],
+  },
 
   // Git Modules
   {
