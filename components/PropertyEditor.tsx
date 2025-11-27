@@ -26,7 +26,12 @@ const PropertyEditor: React.FC<PropertyEditorProps> = ({ module, onChange, onClo
     };
 
     // Determine which fields to show based on defaultProps + common Starship fields
-    const fields = Object.keys({ ...definition.defaultProps, ...module.properties });
+    let fields = Object.keys({ ...definition.defaultProps, ...module.properties });
+
+    // Special handling for 'text' module: only show 'format' (which uses FormatStringEditor)
+    if (module.type === 'text') {
+        fields = ['format'];
+    }
 
     const handleGlyphSelect = (glyph: string) => {
         if (activePopup) {

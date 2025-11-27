@@ -1437,16 +1437,6 @@ export const MODULE_DEFINITIONS: ModuleDefinition[] = [
     },
     variables: ['$symbol', '$output'],
   },
-  {
-    name: 'text',
-    description: 'Static Text',
-    defaultProps: {
-      format: '$text',
-      text: '',
-      style: '',
-    },
-    variables: ['$text'],
-  },
 ];
 
 // Mock data for previewing the prompt

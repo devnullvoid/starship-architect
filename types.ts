@@ -88,6 +88,7 @@ export interface PreviewContext {
   id: string;
   name: string;
   path: string;
+  os?: string; // e.g. "linux", "macos", "windows"
   readOnly?: boolean;
   git?: {
     branch: string;

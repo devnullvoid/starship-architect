@@ -293,18 +293,43 @@ export const generateTOML = (
     toml += `[${mod.type}]\n`;
     toml += `disabled = ${mod.disabled}\n`;
 
+    const primitives: string[] = [];
+    const tables: string[] = [];
+
     Object.entries(mod.properties).forEach(([key, value]) => {
-      // Simple string escaping
-      if (typeof value === 'string') {
-        toml += `${key} = '${value.replace(/'/g, "\\'")}'\n`;
-      } else if (typeof value === 'boolean') {
-        toml += `${key} = ${value}\n`;
-      } else if (typeof value === 'number') {
-        toml += `${key} = ${value}\n`;
+      if (key === 'disabled') return;
+
+      if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+        // Handle objects (like substitutions or symbols) as separate tables
+        const entries = Object.entries(value);
+        if (entries.length > 0) {
+          let tableStr = `[${mod.type}.${key}]\n`;
+          entries.forEach(([k, v]) => {
+            const valStr = typeof v === 'string' ? `'${v.replace(/'/g, "\\'")}'` : v;
+            // Keys with spaces or special chars need quotes
+            const keyStr = /^[a-zA-Z0-9_-]+$/.test(k) ? k : `'${k}'`;
+            tableStr += `${keyStr} = ${valStr}\n`;
+          });
+          tables.push(tableStr);
+        }
       } else {
-        toml += `${key} = ${value}\n`;
+        // Primitives
+        if (typeof value === 'string') {
+          primitives.push(`${key} = '${value.replace(/'/g, "\\'")}'`);
+        } else {
+          primitives.push(`${key} = ${value}`);
+        }
       }
     });
+
+    // Output primitives first
+    primitives.forEach(p => toml += p + '\n');
+
+    // Output tables
+    if (tables.length > 0) {
+      toml += '\n';
+      tables.forEach(t => toml += t + '\n');
+    }
     toml += '\n';
   });
 

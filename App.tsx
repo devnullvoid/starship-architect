@@ -29,6 +29,7 @@ const PREDEFINED_CONTEXTS: import('./types').PreviewContext[] = [
     id: 'home',
     name: 'Home',
     path: '~',
+    os: 'linux',
     time: '14:30:00'
   },
   {
@@ -39,6 +40,7 @@ const PREDEFINED_CONTEXTS: import('./types').PreviewContext[] = [
       branch: 'main',
       status: '?'
     },
+    os: 'linux',
     time: '14:35:00'
   },
   {
@@ -52,6 +54,7 @@ const PREDEFINED_CONTEXTS: import('./types').PreviewContext[] = [
     languages: {
       golang: '1.21.0'
     },
+    os: 'macos',
     time: '15:00:00'
   },
   {
@@ -68,6 +71,7 @@ const PREDEFINED_CONTEXTS: import('./types').PreviewContext[] = [
     package: {
       version: '1.0.0'
     },
+    os: 'windows',
     time: '16:20:00'
   },
   {
@@ -82,6 +86,7 @@ const PREDEFINED_CONTEXTS: import('./types').PreviewContext[] = [
       branch: 'main',
       status: ' +'
     },
+    os: 'linux',
     time: '17:45:00'
   }
 ];
@@ -162,7 +167,20 @@ export default function App() {
   };
 
   const handleUpdateModule = (id: string, updates: Partial<ActiveModule['properties']>) => {
-    setModules(modules.map(m => m.id === id ? { ...m, properties: { ...m.properties, ...updates } } : m));
+    setModules(modules.map(m => {
+      if (m.id === id) {
+        const newProperties = { ...m.properties, ...updates };
+        // Sync root disabled state if it's in the updates or properties
+        // If 'disabled' is in updates, use it. Otherwise keep existing root state?
+        // Actually, if we are editing properties, and 'disabled' changes, we want to update root.
+        let newDisabled = m.disabled;
+        if ('disabled' in updates) {
+          newDisabled = updates.disabled;
+        }
+        return { ...m, disabled: newDisabled, properties: newProperties };
+      }
+      return m;
+    }));
   };
 
   const handleAiGenerate = async () => {

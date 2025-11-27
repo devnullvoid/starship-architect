@@ -67,7 +67,7 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
     const hasRoot = rawPath.startsWith('/');
     const prefix = hasHome ? '~' : hasRoot ? '/' : '';
 
-    const parts = rawPath.replace(/^~?\/+/, '').split('/').filter(Boolean);
+    const parts = rawPath.replace(/^~/, '').split('/').filter(Boolean);
     const substituted = parts.map(p => substitutions[p] ?? p);
 
     let visible = substituted;
@@ -171,9 +171,24 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
                 // We assume success state for the preview
                 variables[v] = mod.properties.success_symbol || def.defaultProps.success_symbol || '❯';
               }
-              // OS Module - Mock Arch Linux
+              // OS Module
               else if (mod.type === 'os' && v === '$symbol') {
-                variables[v] = ' '; // Arch Linux symbol
+                const osName = context.os || 'linux';
+                const symbols = mod.properties.symbols || {};
+                // Default symbols if not overridden in config
+                const defaultSymbols: Record<string, string> = {
+                  linux: ' ',
+                  macos: ' ',
+                  windows: ' ',
+                  android: ' ',
+                  arch: ' ',
+                  debian: ' ',
+                  ubuntu: ' ',
+                  fedora: ' ',
+                  nix: ' ',
+                  unknown: ' '
+                };
+                variables[v] = symbols[osName] || defaultSymbols[osName] || defaultSymbols.linux;
               }
               // Context-aware overrides
               else if (mod.type === 'directory' && v === '$path') {
