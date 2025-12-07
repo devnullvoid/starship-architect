@@ -21,7 +21,7 @@ import { ActiveModule, ModuleDefinition, Theme } from './types';
 import TerminalPreview from './components/TerminalPreview';
 import PropertyEditor from './components/PropertyEditor';
 import ContextSelector from './components/ContextSelector';
-import { generateTOML, parseTOMLToModules, parseBase16Theme, themeToStarshipPalette } from './utils/starship';
+import { generateTOML, parseTOML, parseBase16Theme, themeToStarshipPalette } from './utils/starship';
 import { generateConfigFromPrompt } from './services/geminiService';
 
 const PREDEFINED_CONTEXTS: import('./types').PreviewContext[] = [
@@ -218,10 +218,25 @@ export default function App() {
     setTomlContent(newToml);
 
     try {
-      const newModules = parseTOMLToModules(newToml);
+      const { modules: newModules, config } = parseTOML(newToml);
       if (newModules.length > 0) {
         setModules(newModules);
         setTomlError(null);
+
+        // Apply custom palette if defined in TOML
+        if (config.palette && config.palettes && config.palettes[config.palette]) {
+          const customColors = config.palettes[config.palette];
+
+          // Create a synthetic theme preserving current UI colors but using custom palette
+          const newTheme: Theme = {
+            ...activeTheme,
+            name: config.palette, // Use the name from TOML
+            palette: customColors
+          };
+
+          setActiveTheme(newTheme);
+          setEmbedPalette(true); // Ensure it stays embedded
+        }
       } else {
         // Don't update modules if we couldn't parse any (avoids clearing screen on empty text)
       }

@@ -1,4 +1,4 @@
-import { ActiveModule, ParsedStyle, Theme } from '../types';
+import { ActiveModule, ParsedStyle, Theme, StarshipConfig } from '../types';
 import { MODULE_DEFINITIONS, THEMES } from '../constants';
 import { parse } from 'smol-toml';
 import { load } from 'js-yaml';
@@ -20,9 +20,9 @@ const resolveColor = (colorName: string, theme?: Theme): string => {
     if (theme.colors[normalized as keyof typeof theme.colors]) {
       return theme.colors[normalized as keyof typeof theme.colors];
     }
-    // Check palette colors (base00, base01, etc.)
-    if (theme.palette && theme.palette[colorName as keyof typeof theme.palette]) {
-      return theme.palette[colorName as keyof typeof theme.palette];
+    // Check palette colors
+    if (theme.palette && theme.palette[colorName]) {
+      return theme.palette[colorName];
     }
   }
 
@@ -356,10 +356,19 @@ export const generateTOML = (
  * Parses a TOML string back into ActiveModule[]
  * This is a best-effort parser for the specific subset of TOML used by Starship
  */
-export const parseTOMLToModules = (tomlString: string): ActiveModule[] => {
+export const parseTOML = (tomlString: string): { modules: ActiveModule[], config: StarshipConfig } => {
   try {
     const parsed = parse(tomlString) as Record<string, any>;
     const format = parsed.format as string;
+
+    const config: StarshipConfig = {};
+    if (parsed.palette) config.palette = parsed.palette;
+    if (parsed.palettes) config.palettes = parsed.palettes;
+    if (parsed.add_newline !== undefined) config.add_newline = parsed.add_newline;
+    if (parsed.command_timeout !== undefined) config.command_timeout = parsed.command_timeout;
+    if (parsed.scan_timeout !== undefined) config.scan_timeout = parsed.scan_timeout;
+    if (parsed.right_format) config.right_format = parsed.right_format;
+    if (parsed.continuation_prompt) config.continuation_prompt = parsed.continuation_prompt;
 
     const modules: ActiveModule[] = [];
 
@@ -447,11 +456,11 @@ export const parseTOMLToModules = (tomlString: string): ActiveModule[] => {
       });
     }
 
-    return modules;
+    return { modules, config };
 
   } catch (error) {
     console.error("Failed to parse TOML", error);
-    return [];
+    return { modules: [], config: {} };
   }
 };
 
