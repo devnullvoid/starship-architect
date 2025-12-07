@@ -46,7 +46,7 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
       return !!context.container;
     }
     // Language modules
-    if (['nodejs', 'golang', 'rust', 'python', 'java', 'kotlin', 'dotnet', 'terraform', 'c', 'elixir', 'elm', 'haskell', 'julia', 'lua', 'nim', 'ocaml', 'perl', 'php', 'ruby', 'scala', 'swift', 'zig'].includes(type)) {
+    if (['nodejs', 'golang', 'rust', 'python', 'java', 'kotlin', 'dotnet', 'terraform', 'c', 'elixir', 'elm', 'haskell', 'julia', 'lua', 'nim', 'ocaml', 'perl', 'php', 'ruby', 'scala', 'swift', 'zig', 'gradle', 'bun', 'deno', 'erlang', 'raku', 'vlang', 'crystal', 'dart', 'fennel', 'gleam', 'purescript', 'rlang', 'red', 'solidity', 'typst', 'cobol', 'daml', 'haxe', 'opa', 'quarto', 'rye', 'cmake', 'meson', 'helm', 'buf'].includes(type)) {
       return !!context.languages?.[type];
     }
     // Container/Env modules - hide by default unless we have specific context for them

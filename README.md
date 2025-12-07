@@ -45,7 +45,7 @@ Build, customize, and preview your Starship prompt configuration with an intuiti
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/starship-architect.git
+   git clone https://github.com/devnullvoid/starship-architect.git
    cd starship-architect
    ```
 
@@ -266,6 +266,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 **Built with ❤️ for the developer community**
 
-[Report Bug](https://github.com/yourusername/starship-architect/issues) • [Request Feature](https://github.com/yourusername/starship-architect/issues)
+[Report Bug](https://github.com/devnullvoid/starship-architect/issues) • [Request Feature](https://github.com/devnullvoid/starship-architect/issues)
 
 </div>
