@@ -155,7 +155,15 @@ const TerminalPreview: React.FC<TerminalPreviewProps> = ({ modules, theme, conte
 
             // Get format string (use instance prop or default)
             const format = mod.properties.format || def.defaultProps.format;
-            const style = mod.properties.style || def.defaultProps.style || '';
+            let style = mod.properties.style || def.defaultProps.style || '';
+
+            // Handle module-specific style overrides
+            if (mod.type === 'username') {
+              // Prefer style_user over general style for non-root user
+              if (mod.properties.style_user) {
+                style = mod.properties.style_user;
+              }
+            }
 
             // Prepare mock variables for this module
             const variables: Record<string, string> = {};

@@ -1445,7 +1445,7 @@ export const MOCK_DATA: Record<string, any> = {
     $symbol: '❯',
   },
   username: {
-    $user: 'developer',
+    $user: 'user',
   },
   hostname: {
     $hostname: 'workstation',
